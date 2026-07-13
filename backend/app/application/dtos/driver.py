@@ -12,6 +12,32 @@ class DriverBase(BaseModel):
     """
     Shared attributes for driver operations.
     """
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input(cls, data: any) -> any:
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                if isinstance(v, str):
+                    v = v.strip()
+                    if k == "name":
+                        import re
+                        v = re.sub(r"\s+", " ", v)
+                    if k in ["license_number", "employee_code"]:
+                        v = v.upper()
+                    data[k] = v
+        return data
+
+    name: str = Field(
+        ...,
+        min_length=3,
+        max_length=100,
+        description="Driver full name.",
+    )
+    address: str | None = Field(
+        default=None,
+        max_length=500,
+        description="Optional physical address description.",
+    )
     user_id: uuid.UUID | None = Field(default=None, description="Optional system login account linkage.")
     employee_code: str = Field(
         min_length=3,
@@ -73,6 +99,24 @@ class DriverCreate(DriverBase):
     """
     Request model for driver creation.
     """
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "name": "Raj Kumar",
+                "address": "123 Quarry Road, Jaipur",
+                "employee_code": "DRV-101",
+                "license_number": "DL-1234567890",
+                "license_expiry": "2027-12-31",
+                "license_class": "Heavy Duty",
+                "contact_phone": "+91 9999988888",
+                "emergency_contact_phone": "+91 9999911111",
+                "fixed_salary": "25000.00",
+                "commission_percentage": "5.50",
+                "driver_type": "SALARIED",
+                "current_status": "available"
+            }
+        }
+    }
 
     @field_validator("license_expiry")
     @classmethod
@@ -92,6 +136,33 @@ class DriverUpdate(BaseModel):
     """
     Request model for driver update (allows partial updates).
     """
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "name": "Raj K. Sharma",
+                "address": "456 Mines Road, Jaipur",
+                "contact_phone": "+91 9999977777",
+                "current_status": "on_trip"
+            }
+        }
+    }
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input(cls, data: any) -> any:
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                if isinstance(v, str):
+                    v = v.strip()
+                    if k == "name":
+                        import re
+                        v = re.sub(r"\s+", " ", v)
+                    if k in ["license_number", "employee_code"]:
+                        v = v.upper()
+                    data[k] = v
+        return data
+
+    name: str | None = Field(default=None, min_length=3, max_length=100)
+    address: str | None = Field(default=None, max_length=500)
     user_id: uuid.UUID | None = None
     employee_code: str | None = Field(default=None, min_length=3, max_length=50, pattern=r"^[A-Z0-9_\-]+$")
     license_number: str | None = Field(default=None, min_length=5, max_length=50)

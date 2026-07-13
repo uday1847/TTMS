@@ -16,7 +16,7 @@ from app.domain.exceptions.auth import (
     UserAlreadyExistsException,
 )
 from app.domain.exceptions.base import DomainException
-from app.domain.exceptions.driver import DriverNotFoundException
+from app.domain.exceptions.driver import DriverNotFoundException, DriverHasActiveTripsException, DriverAlreadyExistsException
 
 # Configure structured logging globally
 logging.basicConfig(
@@ -64,7 +64,11 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
         status_code = status.HTTP_404_NOT_FOUND
     elif isinstance(exc, DriverNotFoundException):
         status_code = status.HTTP_404_NOT_FOUND
+    elif isinstance(exc, DriverHasActiveTripsException):
+        status_code = status.HTTP_400_BAD_REQUEST
     elif isinstance(exc, UserAlreadyExistsException):
+        status_code = status.HTTP_409_CONFLICT
+    elif isinstance(exc, DriverAlreadyExistsException):
         status_code = status.HTTP_409_CONFLICT
 
     logger.warning(

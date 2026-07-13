@@ -72,7 +72,7 @@ class Tractor(BaseEntity):
     )
 
     status: Mapped[TractorStatus] = mapped_column(
-        SQLEnum(TractorStatus, name="tractor_status_enum", native_enum=True),
+        SQLEnum(TractorStatus, name="tractor_status_enum", native_enum=True, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=TractorStatus.ACTIVE,
     )

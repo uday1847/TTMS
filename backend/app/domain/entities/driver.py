@@ -27,6 +27,17 @@ class Driver(BaseEntity):
         index=True,
     )
 
+    name: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+        default="",
+    )
+
+    address: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
     # Unique identification details
     employee_code: Mapped[str] = mapped_column(
         String(50),
@@ -80,7 +91,7 @@ class Driver(BaseEntity):
     )
 
     current_status: Mapped[DriverStatus] = mapped_column(
-        SQLEnum(DriverStatus, name="driver_status_enum", native_enum=True),
+        SQLEnum(DriverStatus, name="driver_status_enum", native_enum=True, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=DriverStatus.AVAILABLE,
     )
@@ -99,6 +110,12 @@ class Driver(BaseEntity):
         Index(
             "uq_drivers_license_number",
             "license_number",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
+        Index(
+            "uq_drivers_contact_phone",
+            "contact_phone",
             unique=True,
             postgresql_where="deleted_at IS NULL",
         ),

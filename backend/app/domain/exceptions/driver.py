@@ -17,3 +17,11 @@ class DriverAlreadyExistsException(DomainException):
     """
     def __init__(self, message: str) -> None:
         super().__init__(message)
+
+
+class DriverHasActiveTripsException(DomainException):
+    """
+    Raised when attempting to delete a driver assigned to active trips.
+    """
+    def __init__(self, driver_id: uuid.UUID) -> None:
+        super().__init__(f"Driver with ID {driver_id} cannot be deleted because they are assigned to active trips.")
