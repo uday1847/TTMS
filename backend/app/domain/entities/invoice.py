@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from app.domain.entities.trip import Trip
     from app.domain.entities.party import Party
     from app.domain.entities.invoice_status_history import InvoiceStatusHistory
+    from app.domain.entities.invoice_payment import InvoicePayment
+    from app.domain.entities.invoice_payment_history import InvoicePaymentHistory
 
 
 class Invoice(BaseEntity):
@@ -99,6 +101,12 @@ class Invoice(BaseEntity):
         back_populates="invoice",
         cascade="all, delete-orphan",
         order_by="InvoiceStatusHistory.changed_at.asc()",
+    )
+    payments: Mapped[list["InvoicePayment"]] = relationship(
+        back_populates="invoice",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="InvoicePayment.payment_date.desc()",
     )
 
     # Unique index constraints and amount validation checks

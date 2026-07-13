@@ -10,6 +10,7 @@ from app.api.v1.parties import router as parties_router
 from app.api.v1.trips import router as trips_router
 from app.api.v1.trip_expenses import router as trip_expenses_router
 from app.api.v1.invoices import router as invoices_router
+from app.api.v1.invoice_payments import router as invoice_payments_router
 
 # Central API Router under v1 namespace
 api_router = APIRouter(prefix="/api/v1")
@@ -24,3 +25,4 @@ api_router.include_router(parties_router)
 api_router.include_router(trips_router)
 api_router.include_router(trip_expenses_router)
 api_router.include_router(invoices_router)
+api_router.include_router(invoice_payments_router)

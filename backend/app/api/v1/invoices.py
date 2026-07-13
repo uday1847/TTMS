@@ -84,6 +84,14 @@ def map_invoice_response(invoice: Invoice) -> InvoiceResponse:
     else:
         res.payment_percentage = Decimal("0.00")
 
+    # Calculate payment count and last payment date
+    payments = getattr(invoice, "payments", None)
+    if payments is not None:
+        active_payments = [p for p in payments if p.deleted_at is None and p.payment_status.value == "SUCCESS"]
+        res.payment_count = len(active_payments)
+        if active_payments:
+            res.last_payment_date = max(p.payment_date for p in active_payments)
+
     # Format status label
     res.status_label = invoice.status.value.replace("_", " ").title()
 

@@ -41,10 +41,19 @@ from app.domain.exceptions.trip_expense import (
 )
 from app.domain.exceptions.invoice import (
     InvoiceNotFoundException,
-    InvoiceAlreadyExistsException,
     InvoiceStatusException,
     InvoicePaymentException,
     InvoiceGenerationException,
+    InvoiceAlreadyExistsException,
+)
+from app.domain.exceptions.invoice_payment import (
+    InvoicePaymentNotFoundException,
+    InvoicePaymentExceededException,
+    InvoiceDraftException,
+    InvoiceCancelledException,
+    InvoiceAlreadyPaidException,
+    InvoicePaymentValidationException,
+    ReceiptNotFoundException,
 )
 
 # Configure structured logging globally
@@ -145,8 +154,19 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
         InvoiceStatusException,
         InvoicePaymentException,
         InvoiceGenerationException,
+        InvoicePaymentExceededException,
+        InvoiceDraftException,
+        InvoiceCancelledException,
+        InvoiceAlreadyPaidException,
+        InvoicePaymentValidationException,
     )):
         status_code = status.HTTP_400_BAD_REQUEST
+
+    elif isinstance(exc, InvoicePaymentNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+
+    elif isinstance(exc, ReceiptNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
 
     logger.warning(
         f"Domain exception intercepted: type={exc.__class__.__name__} | "

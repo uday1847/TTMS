@@ -82,6 +82,8 @@ class InvoiceResponse(BaseModel):
     due_days: int = 0
     is_overdue: bool = False
     payment_percentage: Decimal = Decimal("0.00")
+    payment_count: int = 0
+    last_payment_date: date | None = None
     status_label: str = ""
 
     model_config = ConfigDict(
