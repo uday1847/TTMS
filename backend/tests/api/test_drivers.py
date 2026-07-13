@@ -14,6 +14,7 @@ from app.domain.entities.permission import Permission
 from app.domain.entities.user import User
 from app.domain.entities.driver import Driver
 from app.domain.entities.trip import Trip
+from app.domain.enums.trip_status import TripStatus
 from app.domain.entities.tractor import Tractor
 from app.domain.entities.material import Material
 from app.domain.entities.party import Party
@@ -192,16 +193,15 @@ async def test_drivers_module_full_lifecycle() -> None:
                 tractor_obj = (await session.execute(tractor_stmt)).scalars().first()
                 if not tractor_obj:
                     tractor_obj = Tractor(
-                        registration_number="RJ-14-1234",
-                        chassis_number="CHASSIS-1234",
-                        engine_number="ENGINE-1234",
-                        make="Mahindra",
+                        tractor_number="RJ-14-1234",
+                        owner_name="Jaipur Minerals LLC",
+                        rc_number="RC-JAIPUR-888999",
+                        insurance_number="INS-TR-990011",
+                        insurance_expiry=datetime.date.today() + datetime.timedelta(days=365),
+                        manufacturer="Mahindra",
                         model="Arjun",
-                        year_manufactured=2024,
-                        ownership_type="OWNED",
-                        insurance_expiry=datetime.date.today(),
-                        fitness_certificate_expiry=datetime.date.today(),
-                        road_tax_expiry=datetime.date.today(),
+                        registration_date=datetime.date.today(),
+                        remarks="Assigned to test driver active trips checks.",
                         created_by=uuid.UUID(int=1),
                         updated_by=uuid.UUID(int=1)
                     )
@@ -211,12 +211,13 @@ async def test_drivers_module_full_lifecycle() -> None:
                 party_obj = (await session.execute(party_stmt)).scalars().first()
                 if not party_obj:
                     party_obj = Party(
-                        code="PRT-999",
                         name="Jaipur Minerals",
-                        billing_address="123 Road, Jaipur",
-                        contact_person="Director",
-                        contact_phone="9999900000",
                         party_type="CUSTOMER",
+                        mobile_number="9999900000",
+                        address="123 Road, Jaipur",
+                        contact_person="Director",
+                        opening_balance=Decimal("0.00"),
+                        credit_limit=Decimal("50000.00"),
                         created_by=uuid.UUID(int=1),
                         updated_by=uuid.UUID(int=1)
                     )
@@ -254,15 +255,12 @@ async def test_drivers_module_full_lifecycle() -> None:
                     tractor_id=tractor_obj.id,
                     driver_id=uuid.UUID(driver_id),
                     party_id=party_obj.id,
-                    quarry_id=quarry_obj.id,
-                    material_id=material_obj.id,
-                    quantity=Decimal("20.50"),
-                    purchase_rate=Decimal("500.00"),
-                    purchase_amount=Decimal("10250.00"),
-                    sale_rate=Decimal("700.00"),
-                    sale_amount=Decimal("14350.00"),
-                    net_profit=Decimal("4100.00"),
-                    payment_type="CASH",
+                    source_location="Jaipur",
+                    destination_location="Delhi",
+                    expected_delivery_date=datetime.date.today() + datetime.timedelta(days=2),
+                    freight_amount=Decimal("25000.00"),
+                    advance_amount=Decimal("5000.00"),
+                    status=TripStatus.PENDING,
                     is_active=True,
                     created_by=uuid.UUID(int=1),
                     updated_by=uuid.UUID(int=1)

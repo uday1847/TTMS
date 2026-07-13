@@ -96,6 +96,13 @@ class Driver(BaseEntity):
         default=DriverStatus.AVAILABLE,
     )
 
+    current_trip_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid,
+        ForeignKey("trips.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
     # Relationships
     user: Mapped["User | None"] = relationship(foreign_keys=[user_id])
 

@@ -17,6 +17,35 @@ from app.domain.exceptions.auth import (
 )
 from app.domain.exceptions.base import DomainException
 from app.domain.exceptions.driver import DriverNotFoundException, DriverHasActiveTripsException, DriverAlreadyExistsException
+from app.domain.exceptions.tractor import TractorNotFoundException, TractorAlreadyExistsException, TractorHasActiveTripsException
+from app.domain.exceptions.party import PartyNotFoundException, PartyAlreadyExistsException, PartyHasActiveTripsException
+from app.domain.exceptions.trip import (
+    TripNotFoundException,
+    TripAlreadyExistsException,
+    TripStatusException,
+    DriverBusyException,
+    TractorBusyException,
+    TripDeleteException,
+    InactiveDriverException,
+    InactiveTractorException,
+    InactivePartyException,
+    InvalidTripDateException,
+    AdvanceAmountException,
+    TripAlreadyCompletedException,
+)
+from app.domain.exceptions.trip_expense import (
+    TripExpenseNotFoundException,
+    TripCompletedException,
+    TripCancelledException,
+    TripExpenseValidationException,
+)
+from app.domain.exceptions.invoice import (
+    InvoiceNotFoundException,
+    InvoiceAlreadyExistsException,
+    InvoiceStatusException,
+    InvoicePaymentException,
+    InvoiceGenerationException,
+)
 
 # Configure structured logging globally
 logging.basicConfig(
@@ -70,6 +99,54 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
         status_code = status.HTTP_409_CONFLICT
     elif isinstance(exc, DriverAlreadyExistsException):
         status_code = status.HTTP_409_CONFLICT
+    elif isinstance(exc, TractorNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+    elif isinstance(exc, TractorHasActiveTripsException):
+        status_code = status.HTTP_400_BAD_REQUEST
+    elif isinstance(exc, TractorAlreadyExistsException):
+        status_code = status.HTTP_409_CONFLICT
+    elif isinstance(exc, PartyNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+    elif isinstance(exc, PartyHasActiveTripsException):
+        status_code = status.HTTP_400_BAD_REQUEST
+    elif isinstance(exc, PartyAlreadyExistsException):
+        status_code = status.HTTP_409_CONFLICT
+    elif isinstance(exc, TripNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+    elif isinstance(exc, TripAlreadyExistsException):
+        status_code = status.HTTP_409_CONFLICT
+    elif isinstance(exc, (
+        TripStatusException,
+        DriverBusyException,
+        TractorBusyException,
+        TripDeleteException,
+        InactiveDriverException,
+        InactiveTractorException,
+        InactivePartyException,
+        InvalidTripDateException,
+        AdvanceAmountException,
+        TripAlreadyCompletedException,
+        TripCompletedException,
+        TripCancelledException,
+        TripExpenseValidationException,
+    )):
+        status_code = status.HTTP_400_BAD_REQUEST
+
+    elif isinstance(exc, TripExpenseNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+
+    elif isinstance(exc, InvoiceNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+
+    elif isinstance(exc, InvoiceAlreadyExistsException):
+        status_code = status.HTTP_409_CONFLICT
+
+    elif isinstance(exc, (
+        InvoiceStatusException,
+        InvoicePaymentException,
+        InvoiceGenerationException,
+    )):
+        status_code = status.HTTP_400_BAD_REQUEST
 
     logger.warning(
         f"Domain exception intercepted: type={exc.__class__.__name__} | "

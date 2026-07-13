@@ -1,12 +1,9 @@
-from enum import StrEnum
+from enum import Enum
 
 
-class TripStatus(StrEnum):
-    """
-    Defines the states of a trip lifecycle.
-    """
-    PENDING = "pending"
-    DISPATCHED = "dispatched"
-    COMPLETED = "completed"
-    INVOICED = "invoiced"
-    CANCELLED = "cancelled"
+class TripStatus(str, Enum):
+    PENDING = "PENDING"
+    DISPATCHED = "DISPATCHED"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"

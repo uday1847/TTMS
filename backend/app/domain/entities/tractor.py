@@ -1,53 +1,39 @@
 import datetime
-from decimal import Decimal
+import uuid
 
-from sqlalchemy import CheckConstraint, Date, Enum as SQLEnum, Index, Numeric, String
+from sqlalchemy import Date, ForeignKey, Index, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.infrastructure.database.base import BaseEntity
-from app.domain.enums.tractor_status import TractorStatus
 
 
 class Tractor(BaseEntity):
     """
-    Represents heavy vehicle assets, tracking registration, specs, insurance,
-    mileage, and active maintenance status.
+    Represents heavy vehicle assets, tracking registration, specifications,
+    and operational availability.
     """
     __tablename__ = "tractors"
 
-    registration_number: Mapped[str] = mapped_column(
+    tractor_number: Mapped[str] = mapped_column(
         String(30),
         nullable=False,
         index=True,
     )
 
-    chassis_number: Mapped[str] = mapped_column(
+    owner_name: Mapped[str] = mapped_column(
         String(100),
         nullable=False,
     )
 
-    engine_number: Mapped[str] = mapped_column(
+    rc_number: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+        index=True,
+    )
+
+    insurance_number: Mapped[str | None] = mapped_column(
         String(100),
-        nullable=False,
-    )
-
-    make: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
-    )
-
-    model: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
-    )
-
-    year_manufactured: Mapped[int] = mapped_column(
-        nullable=False,
-    )
-
-    ownership_type: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False,  # e.g., 'OWNED', 'LEASED', 'MARKET_HIRE'
+        nullable=True,
     )
 
     insurance_expiry: Mapped[datetime.date] = mapped_column(
@@ -55,35 +41,45 @@ class Tractor(BaseEntity):
         nullable=False,
     )
 
-    fitness_certificate_expiry: Mapped[datetime.date] = mapped_column(
+    manufacturer: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    model: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    registration_date: Mapped[datetime.date | None] = mapped_column(
         Date,
-        nullable=False,
+        nullable=True,
     )
 
-    road_tax_expiry: Mapped[datetime.date] = mapped_column(
-        Date,
-        nullable=False,
+    remarks: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
     )
 
-    current_odometer: Mapped[Decimal] = mapped_column(
-        Numeric(10, 2),
-        nullable=False,
-        default=Decimal("0.00"),
-    )
-
-    status: Mapped[TractorStatus] = mapped_column(
-        SQLEnum(TractorStatus, name="tractor_status_enum", native_enum=True, values_callable=lambda x: [e.value for e in x]),
-        nullable=False,
-        default=TractorStatus.ACTIVE,
+    current_trip_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid,
+        ForeignKey("trips.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
     )
 
     # Constraints and Indexes
     __table_args__ = (
         Index(
-            "uq_tractors_registration_number",
-            "registration_number",
+            "uq_tractors_tractor_number",
+            "tractor_number",
             unique=True,
             postgresql_where="deleted_at IS NULL",
         ),
-        CheckConstraint("current_odometer >= 0", name="chk_tractors_odometer"),
+        Index(
+            "uq_tractors_rc_number",
+            "rc_number",
+            unique=True,
+            postgresql_where="deleted_at IS NULL",
+        ),
     )

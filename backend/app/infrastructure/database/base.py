@@ -104,3 +104,7 @@ import app.domain.entities.audit_log
 import app.domain.entities.notification
 import app.domain.entities.settings
 import app.domain.entities.trip
+import app.domain.entities.trip_status_history
+import app.domain.entities.trip_expense
+import app.domain.entities.invoice
+import app.domain.entities.invoice_status_history
