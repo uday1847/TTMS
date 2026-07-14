@@ -1,17 +1,11 @@
-from abc import ABC, abstractmethod
-
+from typing import Protocol
+import uuid
 from app.domain.entities.role import Role
-from app.domain.repositories.base_repository import BaseRepository
 
-
-class RoleRepository(BaseRepository[Role], ABC):
-    """
-    Role Repository interface detailing role query behaviors.
-    """
-
-    @abstractmethod
-    async def get_by_name(self, name: str) -> Role | None:
-        """
-        Retrieves a role definition by role code name.
-        """
-        pass
+class RoleRepository(Protocol):
+    async def get_by_id(self, role_id: uuid.UUID) -> Role | None: ...
+    async def get_by_name(self, name: str) -> Role | None: ...
+    async def list_roles(self, skip: int = 0, limit: int = 100) -> tuple[list[Role], int]: ...
+    async def create(self, role: Role) -> Role: ...
+    async def update(self, role: Role) -> Role: ...
+    async def delete(self, role: Role, deleted_by: uuid.UUID | None = None, delete_reason: str | None = None) -> None: ...

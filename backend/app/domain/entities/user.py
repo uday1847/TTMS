@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from datetime import datetime
 
 from sqlalchemy import Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,6 +9,13 @@ from app.infrastructure.database.base import BaseEntity
 if TYPE_CHECKING:
     from app.domain.entities.refresh_token import RefreshToken
     from app.domain.entities.role import Role
+    from app.domain.entities.user_session import UserSession
+    from app.domain.entities.login_history import LoginHistory
+    from app.domain.entities.password_history import PasswordHistory
+    from app.domain.entities.user_preference import UserPreference
+
+from sqlalchemy.dialects.postgresql import ENUM
+from app.domain.enums.user_status import UserStatus
 
 
 class User(BaseEntity):
@@ -49,6 +57,38 @@ class User(BaseEntity):
         nullable=True,
     )
 
+    status: Mapped[UserStatus] = mapped_column(
+        ENUM(UserStatus, name="user_status", create_type=False),
+        nullable=False,
+        default=UserStatus.ACTIVE,
+    )
+
+    failed_login_attempts: Mapped[int] = mapped_column(
+        nullable=False,
+        default=0,
+    )
+
+    locked_until: Mapped["datetime | None"] = mapped_column(
+        nullable=True,
+        default=None,
+    )
+
+    last_login_at: Mapped["datetime | None"] = mapped_column(
+        nullable=True,
+        default=None,
+    )
+
+    profile_picture_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+        default=None,
+    )
+
+    token_version: Mapped[int] = mapped_column(
+        nullable=False,
+        default=1,
+    )
+
     # Relationships
     roles: Mapped[list["Role"]] = relationship(
         secondary="user_roles",
@@ -60,6 +100,27 @@ class User(BaseEntity):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+    )
+
+    sessions: Mapped[list["UserSession"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    login_history: Mapped[list["LoginHistory"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    password_history: Mapped[list["PasswordHistory"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    preferences: Mapped["UserPreference"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
     )
 
     # Partial unique indexes for email and username compatibility with soft-deletes

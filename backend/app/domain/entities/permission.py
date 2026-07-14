@@ -8,6 +8,9 @@ from app.infrastructure.database.base import BaseEntity
 if TYPE_CHECKING:
     from app.domain.entities.role import Role
 
+from sqlalchemy.dialects.postgresql import ENUM
+from app.domain.enums.permission_module import PermissionModule
+
 
 class Permission(BaseEntity):
     """
@@ -16,10 +19,16 @@ class Permission(BaseEntity):
     """
     __tablename__ = "permissions"
 
-    code: Mapped[str] = mapped_column(
+    name: Mapped[str] = mapped_column(
         String(100),
         nullable=False,
         index=True,
+    )
+
+    module: Mapped[PermissionModule] = mapped_column(
+        ENUM(PermissionModule, name="permission_module", create_type=False),
+        nullable=False,
+        default=PermissionModule.USERS,
     )
 
     description: Mapped[str | None] = mapped_column(
@@ -33,11 +42,10 @@ class Permission(BaseEntity):
         back_populates="permissions",
     )
 
-    # Unique index matching only non-deleted entries for soft delete compatibility
     __table_args__ = (
         Index(
-            "uq_permissions_code",
-            "code",
+            "uq_permissions_name",
+            "name",
             unique=True,
             postgresql_where="deleted_at IS NULL",
         ),

@@ -1,0 +1,11 @@
+from enum import Enum
+
+class AuditAction(str, Enum):
+    LOGIN = "LOGIN"
+    LOGOUT = "LOGOUT"
+    CREATE = "CREATE"
+    UPDATE = "UPDATE"
+    DELETE = "DELETE"
+    RESTORE = "RESTORE"
+    PASSWORD_CHANGE = "PASSWORD_CHANGE"
+    PERMISSION_CHANGE = "PERMISSION_CHANGE"

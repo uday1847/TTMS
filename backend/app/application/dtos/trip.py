@@ -170,5 +170,7 @@ class TripResponse(BaseModel):
     net_profit: Decimal | None = None
     total_advances: Decimal | None = None
     expense_count: int | None = None
+    total_fuel_amount: Decimal | None = None
+    fuel_transaction_count: int | None = None
 
     model_config = ConfigDict(from_attributes=True)

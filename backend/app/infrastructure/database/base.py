@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, ForeignKey, Uuid
+from sqlalchemy import DateTime, ForeignKey, Uuid, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -66,6 +66,12 @@ class BaseEntity(Base):
         default=None,
     )
 
+    delete_reason: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        default=None,
+    )
+
     # 5. Logical Status Flag
     is_active: Mapped[bool] = mapped_column(
         nullable=False,
@@ -92,6 +98,10 @@ import app.domain.entities.permission
 import app.domain.entities.role_permission
 import app.domain.entities.user_role
 import app.domain.entities.refresh_token
+import app.domain.entities.login_history
+import app.domain.entities.password_history
+import app.domain.entities.user_session
+import app.domain.entities.user_preference
 import app.domain.entities.driver
 import app.domain.entities.tractor
 import app.domain.entities.party
@@ -110,3 +120,8 @@ import app.domain.entities.invoice
 import app.domain.entities.invoice_status_history
 import app.domain.entities.invoice_payment
 import app.domain.entities.invoice_payment_history
+import app.domain.entities.maintenance
+import app.domain.entities.maintenance_history
+import app.domain.entities.fuel_vendor
+import app.domain.entities.fuel_transaction
+import app.domain.entities.fuel_history

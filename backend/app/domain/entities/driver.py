@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, Date, Enum as SQLEnum, ForeignKey, Index, Numeric, String, Uuid
+from sqlalchemy import CheckConstraint, Date, Enum as SQLEnum, ForeignKey, Index, Numeric, String, Uuid, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import BaseEntity
@@ -31,6 +31,16 @@ class Driver(BaseEntity):
         String(100),
         nullable=False,
         default="",
+    )
+
+    deleted_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    fuel_transactions: Mapped[list["FuelTransaction"]] = relationship(
+        "FuelTransaction",
+        back_populates="driver",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
     address: Mapped[str | None] = mapped_column(

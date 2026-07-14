@@ -12,6 +12,10 @@ from app.infrastructure.database.base import Base
 if TYPE_CHECKING:
     from app.domain.entities.user import User
 
+from sqlalchemy.dialects.postgresql import ENUM
+from app.domain.enums.audit_action import AuditAction
+from app.domain.enums.permission_module import PermissionModule
+
 
 class AuditLog(Base):
     """
@@ -34,9 +38,15 @@ class AuditLog(Base):
         index=True,
     )
 
-    action: Mapped[str] = mapped_column(
-        String(10),
-        nullable=False,  # e.g., 'INSERT', 'UPDATE', 'DELETE', 'RESTORE'
+    action: Mapped[AuditAction] = mapped_column(
+        ENUM(AuditAction, name="audit_action", create_type=False),
+        nullable=False,
+    )
+
+    module: Mapped[PermissionModule] = mapped_column(
+        ENUM(PermissionModule, name="permission_module", create_type=False),
+        nullable=False,
+        default=PermissionModule.USERS,
     )
 
     table_name: Mapped[str] = mapped_column(

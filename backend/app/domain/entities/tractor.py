@@ -1,10 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import Date, ForeignKey, Index, String, Uuid
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Date, ForeignKey, Index, String, Uuid, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 
 from app.infrastructure.database.base import BaseEntity
+from app.domain.enums.tractor_status import TractorStatus
 
 
 class Tractor(BaseEntity):
@@ -66,6 +68,37 @@ class Tractor(BaseEntity):
         ForeignKey("trips.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
+    )
+    
+    status: Mapped[TractorStatus] = mapped_column(
+        PGEnum(TractorStatus, name="tractor_status_enum", create_type=False),
+        nullable=False,
+        default=TractorStatus.ACTIVE,
+    )
+
+    current_odometer: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+    )
+
+    fuel_capacity: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    maintenances: Mapped[list["Maintenance"]] = relationship(
+        "Maintenance",
+        back_populates="tractor",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+
+    fuel_transactions: Mapped[list["FuelTransaction"]] = relationship(
+        "FuelTransaction",
+        back_populates="tractor",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
     # Constraints and Indexes

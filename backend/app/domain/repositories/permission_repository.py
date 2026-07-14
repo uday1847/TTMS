@@ -1,17 +1,7 @@
-from abc import ABC, abstractmethod
-
+from typing import Protocol
+import uuid
 from app.domain.entities.permission import Permission
-from app.domain.repositories.base_repository import BaseRepository
 
-
-class PermissionRepository(BaseRepository[Permission], ABC):
-    """
-    Permission Repository interface detailing permission query behaviors.
-    """
-
-    @abstractmethod
-    async def get_by_code(self, code: str) -> Permission | None:
-        """
-        Retrieves a permission definition by permission code name.
-        """
-        pass
+class PermissionRepository(Protocol):
+    async def list_all(self) -> list[Permission]: ...
+    async def get_by_ids(self, permission_ids: list[uuid.UUID]) -> list[Permission]: ...

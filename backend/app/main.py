@@ -55,6 +55,22 @@ from app.domain.exceptions.invoice_payment import (
     InvoicePaymentValidationException,
     ReceiptNotFoundException,
 )
+from app.domain.exceptions.maintenance import (
+    MaintenanceNotFoundException,
+    MaintenanceAlreadyScheduledException,
+    MaintenanceStatusException,
+    MaintenanceValidationException,
+    MaintenanceDeleteException,
+)
+from app.domain.exceptions.fuel import (
+    FuelTransactionNotFoundException,
+    FuelValidationException,
+    FuelCapacityExceededException,
+    FuelMileageException,
+    FuelOdometerException,
+    FuelVendorNotFoundException,
+    FuelDuplicateException,
+)
 
 # Configure structured logging globally
 logging.basicConfig(
@@ -167,6 +183,23 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
 
     elif isinstance(exc, ReceiptNotFoundException):
         status_code = status.HTTP_404_NOT_FOUND
+
+    elif isinstance(exc, (MaintenanceNotFoundException, FuelTransactionNotFoundException, FuelVendorNotFoundException)):
+        status_code = status.HTTP_404_NOT_FOUND
+
+    elif isinstance(exc, (MaintenanceAlreadyScheduledException, FuelDuplicateException)):
+        status_code = status.HTTP_409_CONFLICT
+
+    elif isinstance(exc, (
+        MaintenanceStatusException,
+        MaintenanceValidationException,
+        FuelValidationException,
+        FuelCapacityExceededException,
+        FuelOdometerException,
+        FuelMileageException,
+        MaintenanceDeleteException,
+    )):
+        status_code = status.HTTP_400_BAD_REQUEST
 
     logger.warning(
         f"Domain exception intercepted: type={exc.__class__.__name__} | "

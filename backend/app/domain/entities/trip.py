@@ -125,6 +125,12 @@ class Trip(BaseEntity):
         lazy="selectin",
         foreign_keys="[Invoice.trip_id]"
     )
+    fuel_transactions: Mapped[list["FuelTransaction"]] = relationship(
+        "FuelTransaction",
+        back_populates="trip",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
 
     # Constraints and Indexes
     __table_args__ = (

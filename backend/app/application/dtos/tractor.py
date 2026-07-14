@@ -71,6 +71,12 @@ class TractorBase(BaseModel):
         max_length=500,
         description="Nullable audit or general remarks.",
     )
+    fuel_capacity: int | None = Field(
+        default=None,
+        gt=0,
+        le=2000,
+        description="Fuel tank capacity in liters.",
+    )
 
 
 class TractorCreate(TractorBase):
@@ -139,6 +145,7 @@ class TractorUpdate(BaseModel):
     model: str | None = Field(default=None, max_length=50)
     registration_date: date | None = Field(default=None)
     remarks: str | None = Field(default=None, max_length=500)
+    fuel_capacity: int | None = Field(default=None, gt=0, le=2000)
     is_active: bool | None = None
 
     @field_validator("insurance_expiry")
@@ -163,8 +170,15 @@ class TractorResponse(BaseModel):
     model: str | None = None
     registration_date: date | None = None
     remarks: str | None = None
+    status: str
+    current_odometer: int
+    fuel_capacity: int | None = None
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    
+    # Computed Fuel Stats
+    total_fuel_amount: float = 0.0
+    average_kmpl: float | None = None
 
     model_config = ConfigDict(from_attributes=True)

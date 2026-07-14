@@ -1,0 +1,7 @@
+from enum import Enum
+
+class LoginResult(str, Enum):
+    SUCCESS = "SUCCESS"
+    FAILED_BAD_CREDENTIALS = "FAILED_BAD_CREDENTIALS"
+    FAILED_LOCKED = "FAILED_LOCKED"
+    FAILED_INACTIVE = "FAILED_INACTIVE"

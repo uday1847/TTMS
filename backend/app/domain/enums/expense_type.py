@@ -17,4 +17,5 @@ class ExpenseType(str, Enum):
     POLICE_FINE = "POLICE_FINE"
     PARKING = "PARKING"
     BROKER_COMMISSION = "BROKER_COMMISSION"
+    FUEL = "FUEL"
     OTHER = "OTHER"

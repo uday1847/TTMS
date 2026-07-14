@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
 
 from app.domain.entities.permission import Permission
 from app.domain.repositories.permission_repository import PermissionRepository
@@ -14,10 +15,15 @@ class SQLAlchemyPermissionRepository(SQLAlchemyBaseRepository[Permission], Permi
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Permission)
 
-    async def get_by_code(self, code: str) -> Permission | None:
+    async def list_all(self) -> list[Permission]:
+        stmt = select(Permission).where(Permission.deleted_at.is_(None))
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_by_ids(self, permission_ids: list[uuid.UUID]) -> list[Permission]:
         stmt = select(Permission).where(
-            Permission.code == code,
+            Permission.id.in_(permission_ids),
             Permission.deleted_at.is_(None)
         )
         result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        return list(result.scalars().all())
