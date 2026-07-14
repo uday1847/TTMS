@@ -38,3 +38,12 @@ async def db_session() -> AsyncSession:
         
     # Dispose pool after test to release connections cleanly
     await engine.dispose()
+
+
+from httpx import AsyncClient, ASGITransport
+import app.main
+
+@pytest_asyncio.fixture(scope="function")
+async def async_client():
+    async with AsyncClient(transport=ASGITransport(app=app.main.app), base_url="http://test") as ac:
+        yield ac

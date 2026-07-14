@@ -39,13 +39,13 @@ class SQLAlchemyFleetReportRepository(FleetReportRepository):
         stmt = select(
             Tractor.tractor_number.label("tractor"),
             func.count(Trip.id).label("trip_count"),
-            func.sum(Invoice.total_amount).label("income")
+            func.sum(Invoice.gross_amount).label("income")
         ).select_from(Tractor).outerjoin(Trip, Trip.tractor_id == Tractor.id).outerjoin(Invoice, Invoice.trip_id == Trip.id).where(Tractor.deleted_at.is_(None))
         
         if start_date: stmt = stmt.where(Trip.trip_date >= start_date)
         if end_date: stmt = stmt.where(Trip.trip_date <= end_date)
         
-        stmt = stmt.group_by(Tractor.id).order_by(func.sum(Invoice.total_amount).desc())
+        stmt = stmt.group_by(Tractor.id).order_by(func.sum(Invoice.gross_amount).desc())
         
         result = await self.session.execute(stmt)
         return [{"tractor": row.tractor, "trip_count": row.trip_count, "income": row.income or 0, "fuel_cost": 0, "maintenance_cost": 0, "trip_expense": 0, "profit": 0} for row in result.fetchall()]

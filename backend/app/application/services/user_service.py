@@ -95,3 +95,18 @@ class UserService:
             "locked_users": locked,
             "inactive_users": total - active - locked
         }
+
+    async def verify_user_permission(self, user_id: uuid.UUID, required_permission: str) -> bool:
+        user = await self.get_user_by_id(user_id)
+        for role in user.roles:
+            for perm in role.permissions:
+                if perm.name == required_permission:
+                    return True
+        return False
+
+    async def verify_user_role(self, user_id: uuid.UUID, required_role: str) -> bool:
+        user = await self.get_user_by_id(user_id)
+        for role in user.roles:
+            if role.name.lower() == required_role.lower():
+                return True
+        return False

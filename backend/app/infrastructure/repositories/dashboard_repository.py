@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
 from datetime import date
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.repositories.dashboard_repository import DashboardRepository
@@ -38,7 +38,7 @@ class SQLAlchemyDashboardRepository(DashboardRepository):
         trip_res = (await self.session.execute(stmt_trips)).fetchone()
         
         # Financial metrics (Income from trips or invoices)
-        stmt_income = select(func.coalesce(func.sum(Invoice.total_amount), 0)).where(Invoice.deleted_at.is_(None))
+        stmt_income = select(func.coalesce(func.sum(Invoice.gross_amount), 0)).where(Invoice.deleted_at.is_(None))
         if start_date: stmt_income = stmt_income.where(Invoice.invoice_date >= start_date)
         if end_date: stmt_income = stmt_income.where(Invoice.invoice_date <= end_date)
         total_income = (await self.session.execute(stmt_income)).scalar_one()
@@ -92,7 +92,7 @@ class SQLAlchemyDashboardRepository(DashboardRepository):
         
         stmt_rev = select(
             func.to_char(Invoice.invoice_date, 'YYYY-MM').label('month'),
-            func.sum(Invoice.total_amount).label('revenue')
+            func.sum(Invoice.gross_amount).label('revenue')
         ).where(Invoice.deleted_at.is_(None))
         
         if start_date: stmt_rev = stmt_rev.where(Invoice.invoice_date >= start_date)

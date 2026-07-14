@@ -45,11 +45,11 @@ async def test_sqlalchemy_user_repository_get_with_roles_and_permissions(db_sess
     user_repo = SQLAlchemyUserRepository(db_session)
     
     # 1. Arrange
-    permission_code = f"integration_perm_{uuid.uuid4().hex[:8]}"
+    permission_name = f"integration_perm_{uuid.uuid4().hex[:8]}"
     role_name = f"integration_role_{uuid.uuid4().hex[:8]}"
     user_email = f"integration_user_{uuid.uuid4().hex[:8]}@ttms.com"
     
-    permission = Permission(code=permission_code, is_active=True)
+    permission = Permission(name=permission_name, module="USERS", is_active=True)
     role = Role(name=role_name, display_name="Integration Role", is_active=True, permissions=[permission])
     user = User(
         email=user_email,
@@ -75,7 +75,7 @@ async def test_sqlalchemy_user_repository_get_with_roles_and_permissions(db_sess
         assert len(retrieved.roles) == 1
         assert retrieved.roles[0].name == role_name
         assert len(retrieved.roles[0].permissions) == 1
-        assert retrieved.roles[0].permissions[0].code == permission_code
+        assert retrieved.roles[0].permissions[0].name == permission_name
     finally:
         # Cleanup
         await db_session.execute(delete(User).where(User.id == user.id))

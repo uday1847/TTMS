@@ -26,4 +26,4 @@ class UserPreference(BaseEntity):
     notification_settings: Mapped[str] = mapped_column(String(1000), nullable=False, default="{}")
 
     # Relationships
-    user: Mapped["User"] = relationship(back_populates="preferences")
+    user: Mapped["User"] = relationship(back_populates="preferences", foreign_keys=[user_id])

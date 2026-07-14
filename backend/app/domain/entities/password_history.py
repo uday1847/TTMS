@@ -20,4 +20,4 @@ class PasswordHistory(BaseEntity):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Relationships
-    user: Mapped["User"] = relationship(back_populates="password_history")
+    user: Mapped["User"] = relationship(back_populates="password_history", foreign_keys=[user_id])

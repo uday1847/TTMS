@@ -24,7 +24,7 @@ def get_user_service(session: AsyncSession = Depends(get_session)) -> UserServic
     """
     user_repo = SQLAlchemyUserRepository(session)
     role_repo = SQLAlchemyRoleRepository(session)
-    return UserService(session, user_repo, role_repo)
+    return UserService(user_repo, role_repo)
 
 
 async def get_current_user(
@@ -41,8 +41,9 @@ async def get_current_user(
     )
 
     try:
-        payload = decode_token(token)
-        if payload.get("type") != "access":
+        from app.application.services.jwt_service import JWTService
+        payload = JWTService.verify_token(token, expected_type="access")
+        if not payload:
             raise InvalidCredentialsException()
         user_id_str = validate_auth_token_payload(payload)
         user_id = uuid.UUID(user_id_str)

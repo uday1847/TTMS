@@ -34,4 +34,4 @@ class LoginHistory(BaseEntity):
     failure_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # Relationships
-    user: Mapped["User"] = relationship(back_populates="login_history")
+    user: Mapped["User"] = relationship(back_populates="login_history", foreign_keys=[user_id])

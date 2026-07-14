@@ -15,7 +15,7 @@ from app.domain.exceptions.auth import (
     TokenExpiredException,
     UserAlreadyExistsException,
 )
-from app.domain.exceptions.base import DomainException
+from app.domain.exceptions.base import DomainException, UnauthorizedException
 from app.domain.exceptions.driver import DriverNotFoundException, DriverHasActiveTripsException, DriverAlreadyExistsException
 from app.domain.exceptions.tractor import TractorNotFoundException, TractorAlreadyExistsException, TractorHasActiveTripsException
 from app.domain.exceptions.party import PartyNotFoundException, PartyAlreadyExistsException, PartyHasActiveTripsException
@@ -108,7 +108,7 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
         status_code = status.HTTP_401_UNAUTHORIZED
     elif isinstance(exc, TokenExpiredException):
         status_code = status.HTTP_401_UNAUTHORIZED
-    elif isinstance(exc, AuthenticationException):
+    elif isinstance(exc, (AuthenticationException, UnauthorizedException)):
         status_code = status.HTTP_401_UNAUTHORIZED
     elif isinstance(exc, PermissionDeniedException):
         status_code = status.HTTP_403_FORBIDDEN

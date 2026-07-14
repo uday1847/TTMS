@@ -105,22 +105,26 @@ class User(BaseEntity):
     sessions: Mapped[list["UserSession"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+        foreign_keys="[UserSession.user_id]"
     )
 
     login_history: Mapped[list["LoginHistory"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+        foreign_keys="[LoginHistory.user_id]"
     )
 
     password_history: Mapped[list["PasswordHistory"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+        foreign_keys="[PasswordHistory.user_id]"
     )
 
     preferences: Mapped["UserPreference"] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
         uselist=False,
+        foreign_keys="[UserPreference.user_id]"
     )
 
     # Partial unique indexes for email and username compatibility with soft-deletes

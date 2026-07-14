@@ -32,10 +32,8 @@ async def list_users(
     """
     Retrieves a paginated list of users. If a query 'q' is provided, performs a text-based search.
     """
-    if q:
-        items, total = await user_service.search_users(q, page, size)
-    else:
-        items, total = await user_service.paginate_users(page, size)
+    skip = (page - 1) * size
+    items, total = await user_service.list_users(skip, size, search=q)
 
     data = PaginatedData(
         items=[UserResponse.model_validate(u) for u in items],

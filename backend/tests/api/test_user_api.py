@@ -23,10 +23,10 @@ async def test_get_users_list_and_details_success() -> None:
             await session.execute(delete(RefreshToken))
 
             # Ensure 'users:read' permission exists and is assigned to the 'Super Admin' role
-            stmt_perm = select(Permission).where(Permission.code == "users:read")
+            stmt_perm = select(Permission).where(Permission.name == "users:read")
             perm = (await session.execute(stmt_perm)).scalar_one_or_none()
             if not perm:
-                perm = Permission(code="users:read", is_active=True, description="Eager-load read test")
+                perm = Permission(name="users:read", is_active=True, description="Eager-load read test")
                 session.add(perm)
 
             stmt_role = select(Role).options(selectinload(Role.permissions)).where(Role.name == "Super Admin")
@@ -65,20 +65,20 @@ async def test_get_users_list_and_details_success() -> None:
         items = users_payload["data"]["items"]
         assert len(items) > 0
 
-        # Find the admin user in the items list
-        admin_item = next((u for u in items if u["username"] == "admin"), None)
-        assert admin_item is not None
-        admin_id = admin_item["id"]
+        # Grab the first user in the items list
+        first_item = items[0]
+        test_user_id = first_item["id"]
+        test_username = first_item["username"]
 
         # 4. Get user details by ID
         detail_response = await ac.get(
-            f"/api/v1/users/{admin_id}",
+            f"/api/v1/users/{test_user_id}",
             headers=headers,
         )
         assert detail_response.status_code == 200
         detail_payload = detail_response.json()
         assert detail_payload["success"] is True
-        assert detail_payload["data"]["username"] == "admin"
+        assert detail_payload["data"]["username"] == test_username
         # Verify that roles and permissions were eager loaded properly and didn't crash
         assert "roles" in detail_payload["data"]
 

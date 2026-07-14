@@ -50,7 +50,7 @@ class AuthenticationService:
             raise UnauthorizedException("Account is inactive")
 
         if user.status == UserStatus.LOCKED:
-            if user.locked_until and user.locked_until > datetime.now(timezone.utc):
+            if user.locked_until and user.locked_until > datetime.now(timezone.utc).replace(tzinfo=None):
                 login_history.result = LoginResult.FAILED_LOCKED
                 await self.login_history_repository.create(login_history)
                 raise UnauthorizedException("Account is locked")
@@ -66,7 +66,7 @@ class AuthenticationService:
             user.failed_login_attempts += 1
             if user.failed_login_attempts >= security_settings.MAX_LOGIN_ATTEMPTS:
                 user.status = UserStatus.LOCKED
-                user.locked_until = datetime.now(timezone.utc) + timedelta(minutes=security_settings.ACCOUNT_LOCK_DURATION_MINUTES)
+                user.locked_until = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(minutes=security_settings.ACCOUNT_LOCK_DURATION_MINUTES)
                 user.token_version += 1
             await self.user_repository.update(user)
             login_history.result = LoginResult.FAILED_BAD_CREDENTIALS
@@ -76,7 +76,7 @@ class AuthenticationService:
         # Success
         user.failed_login_attempts = 0
         user.locked_until = None
-        user.last_login_at = datetime.now(timezone.utc)
+        user.last_login_at = datetime.now(timezone.utc).replace(tzinfo=None)
         await self.user_repository.update(user)
         
         await self.login_history_repository.create(login_history)
