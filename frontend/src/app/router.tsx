@@ -13,7 +13,10 @@ const DriversPage = lazy(() => import('@/features/drivers/pages/DriverListPage')
 const DriverCreatePage = lazy(() => import('@/features/drivers/pages/DriverCreatePage'))
 const DriverDetailsPage = lazy(() => import('@/features/drivers/pages/DriverDetailsPage'))
 const DriverEditPage = lazy(() => import('@/features/drivers/pages/DriverEditPage'))
-const TractorsPage = lazy(() => import('@/features/tractors/pages/tractors-page'))
+const TractorListPage = lazy(() => import('@/features/tractors/pages/TractorListPage'))
+const TractorCreatePage = lazy(() => import('@/features/tractors/pages/TractorCreatePage'))
+const TractorDetailsPage = lazy(() => import('@/features/tractors/pages/TractorDetailsPage'))
+const TractorEditPage = lazy(() => import('@/features/tractors/pages/TractorEditPage'))
 const PartiesPage = lazy(() => import('@/features/parties/pages/parties-page'))
 const QuarriesPage = lazy(() => import('@/features/quarries/pages/quarries-page'))
 const MaterialsPage = lazy(() => import('@/features/materials/pages/materials-page'))
@@ -119,14 +122,47 @@ export function AppRouter() {
                 />
               </Route>
             </Route>
-            <Route
-              path="/tractors"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <TractorsPage />
-                </Suspense>
-              }
-            />
+            {/* Tractors Routes */}
+            <Route path="/tractors">
+              <Route element={<ProtectedRoute permission="tractors:read" />}>
+                <Route
+                  index
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TractorListPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TractorDetailsPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="tractors:create" />}>
+                <Route
+                  path="create"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TractorCreatePage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="tractors:update" />}>
+                <Route
+                  path=":id/edit"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TractorEditPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+            </Route>
             <Route
               path="/parties"
               element={

@@ -9,9 +9,12 @@ export const api = axios.create({
   },
 });
 
+import { useAuthStore } from '@/stores/auth-store';
+
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    // Get token from Zustand store instead of raw localStorage
+    const token = useAuthStore.getState().accessToken;
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
