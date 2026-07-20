@@ -20,7 +20,11 @@ const TractorEditPage = lazy(() => import('@/features/tractors/pages/TractorEdit
 const PartiesPage = lazy(() => import('@/features/parties/pages/parties-page'))
 const QuarriesPage = lazy(() => import('@/features/quarries/pages/quarries-page'))
 const MaterialsPage = lazy(() => import('@/features/materials/pages/materials-page'))
-const TripsPage = lazy(() => import('@/features/trips/pages/trips-page'))
+const TripListPage = lazy(() => import('@/features/trips/pages/TripListPage'))
+const TripCreatePage = lazy(() => import('@/features/trips/pages/TripCreatePage'))
+const TripDetailsPage = lazy(() => import('@/features/trips/pages/TripDetailsPage'))
+const TripEditPage = lazy(() => import('@/features/trips/pages/TripEditPage'))
+const TripHistoryPage = lazy(() => import('@/features/trips/pages/TripHistoryPage'))
 const ExpensesPage = lazy(() => import('@/features/expenses/pages/expenses-page'))
 const PaymentsPage = lazy(() => import('@/features/payments/pages/payments-page'))
 const ReportsPage = lazy(() => import('@/features/reports/pages/reports-page'))
@@ -187,14 +191,55 @@ export function AppRouter() {
                 </Suspense>
               }
             />
-            <Route
-              path="/trips"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <TripsPage />
-                </Suspense>
-              }
-            />
+            {/* Trips Routes */}
+            <Route path="/trips">
+              <Route element={<ProtectedRoute permission="trips:read" />}>
+                <Route
+                  index
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TripListPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TripDetailsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path=":id/history"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TripHistoryPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="trips:create" />}>
+                <Route
+                  path="create"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TripCreatePage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="trips:update" />}>
+                <Route
+                  path=":id/edit"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <TripEditPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+            </Route>
             <Route
               path="/expenses"
               element={
