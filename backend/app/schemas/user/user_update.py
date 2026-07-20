@@ -1,13 +1,10 @@
-from pydantic import BaseModel, EmailStr, Field
+import warnings
+from app.application.dtos.users import UserUpdate
 
+warnings.warn(
+    "Importing UserUpdate from app.schemas is deprecated. Use app.application.dtos.users instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-class UserUpdate(BaseModel):
-    """
-    Request model for modifying a user profile (supports partial updates).
-    """
-    email: EmailStr | None = Field(default=None, description="Updated user email address.")
-    username: str | None = Field(default=None, min_length=3, max_length=100, pattern=r"^[a-zA-Z0-9_\-]+$")
-    first_name: str | None = Field(default=None, min_length=1, max_length=100)
-    last_name: str | None = Field(default=None, min_length=1, max_length=100)
-    phone: str | None = Field(default=None, min_length=10, max_length=30, pattern=r"^\+?[0-9\-\s]+$")
-    is_active: bool | None = Field(default=None, description="Updated logical user status.")
+__all__ = ["UserUpdate"]

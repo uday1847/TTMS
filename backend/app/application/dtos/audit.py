@@ -1,13 +1,13 @@
 import uuid
 from typing import Any
-from pydantic import BaseModel
 from datetime import datetime
 from app.domain.enums.audit_action import AuditAction
 from app.domain.enums.permission_module import PermissionModule
 from app.domain.enums.login_result import LoginResult
 from app.domain.enums.session_status import SessionStatus
+from app.application.dtos.base import BaseDTO
 
-class AuditResponse(BaseModel):
+class AuditResponse(BaseDTO):
     id: uuid.UUID
     user_id: uuid.UUID | None
     action: AuditAction
@@ -20,7 +20,7 @@ class AuditResponse(BaseModel):
     user_agent: str | None
     created_at: datetime
 
-class LoginHistoryResponse(BaseModel):
+class LoginHistoryResponse(BaseDTO):
     id: uuid.UUID
     user_id: uuid.UUID
     ip_address: str | None
@@ -31,7 +31,7 @@ class LoginHistoryResponse(BaseModel):
     failure_reason: str | None
     created_at: datetime
 
-class SessionResponse(BaseModel):
+class SessionResponse(BaseDTO):
     id: uuid.UUID
     user_id: uuid.UUID
     device_fingerprint: str | None

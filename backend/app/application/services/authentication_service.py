@@ -50,10 +50,15 @@ class AuthenticationService:
             raise UnauthorizedException("Account is inactive")
 
         if user.status == UserStatus.LOCKED:
-            if user.locked_until and user.locked_until > datetime.now(timezone.utc).replace(tzinfo=None):
-                login_history.result = LoginResult.FAILED_LOCKED
-                await self.login_history_repository.create(login_history)
-                raise UnauthorizedException("Account is locked")
+            if user.locked_until:
+                now_utc = datetime.now(timezone.utc)
+                locked_until_utc = user.locked_until
+                if locked_until_utc.tzinfo is None:
+                    locked_until_utc = locked_until_utc.replace(tzinfo=timezone.utc)
+                if locked_until_utc > now_utc:
+                    login_history.result = LoginResult.FAILED_LOCKED
+                    await self.login_history_repository.create(login_history)
+                    raise UnauthorizedException("Account is locked")
             else:
                 # Lock expired
                 user.status = UserStatus.ACTIVE
@@ -83,12 +88,14 @@ class AuthenticationService:
 
         user_with_perms = await self.user_repository.get_with_roles_and_permissions(user.id)
         permissions = []
+        roles = []
         if user_with_perms:
             for role in user_with_perms.roles:
+                roles.append(role.name)
                 for perm in role.permissions:
                     permissions.append(perm.name)
         
-        access_token = JWTService.create_access_token(user.id, user.email, user.token_version, permissions)
+        access_token = JWTService.create_access_token(user.id, user.email, user.token_version, permissions, roles)
         jti = str(uuid.uuid4())
         refresh_token = JWTService.create_refresh_token(user.id, jti)
 

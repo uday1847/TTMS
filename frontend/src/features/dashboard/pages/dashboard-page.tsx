@@ -1,3 +1,6 @@
+import { Link } from 'react-router'
+import { PermissionGuard } from '@/shared/auth'
+
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -13,6 +16,20 @@ export default function DashboardPage() {
             <div className="h-8 w-16 bg-muted rounded animate-pulse"></div>
           </div>
         ))}
+      </div>
+
+      <div>
+        <h2 className="text-xl font-semibold tracking-tight mb-4">Quick Actions</h2>
+        <div className="flex gap-4">
+          <PermissionGuard permission="users:read">
+            <Link
+              to="/users"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Manage Users
+            </Link>
+          </PermissionGuard>
+        </div>
       </div>
     </div>
   )

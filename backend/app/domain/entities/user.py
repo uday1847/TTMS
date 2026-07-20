@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.domain.entities.login_history import LoginHistory
     from app.domain.entities.password_history import PasswordHistory
     from app.domain.entities.user_preference import UserPreference
+    from app.domain.entities.user_permission import UserPermission
 
 from sqlalchemy.dialects.postgresql import ENUM
 from app.domain.enums.user_status import UserStatus
@@ -95,6 +96,12 @@ class User(BaseEntity):
         primaryjoin="User.id == UserRole.user_id",
         secondaryjoin="Role.id == UserRole.role_id",
         back_populates="users",
+    )
+
+    direct_permissions: Mapped[list["UserPermission"]] = relationship(
+        back_populates=None,
+        cascade="all, delete-orphan",
+        foreign_keys="[UserPermission.user_id]"
     )
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(

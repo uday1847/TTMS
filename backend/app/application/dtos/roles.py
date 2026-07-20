@@ -1,22 +1,27 @@
 import uuid
-from pydantic import BaseModel
 from datetime import datetime
-from app.domain.enums.role_type import RoleType
+from pydantic import Field
 
-class RoleCreate(BaseModel):
-    name: str
-    description: str | None = None
+from app.domain.enums.role_type import RoleType
+from app.application.dtos.base import BaseDTO
+
+class RoleCreate(BaseDTO):
+    name: str = Field(..., min_length=2, max_length=50)
+    display_name: str = Field(..., min_length=2, max_length=100)
+    description: str | None = Field(default=None, max_length=255)
     permission_ids: list[uuid.UUID] = []
 
-class RoleUpdate(BaseModel):
-    name: str | None = None
-    description: str | None = None
+class RoleUpdate(BaseDTO):
+    name: str | None = Field(default=None, min_length=2, max_length=50)
+    display_name: str | None = Field(default=None, min_length=2, max_length=100)
+    description: str | None = Field(default=None, max_length=255)
     permission_ids: list[uuid.UUID] | None = None
 
-class RoleResponse(BaseModel):
+class RoleResponse(BaseDTO):
     id: uuid.UUID
     name: str
-    description: str | None
-    role_type: RoleType
-    created_at: datetime
-    updated_at: datetime
+    display_name: str
+    description: str | None = None
+    role_type: RoleType | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None

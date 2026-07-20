@@ -23,6 +23,13 @@ class PermissionChecker:
     ) -> None:
         has_permission = await user_service.verify_user_permission(current_user.id, self.required_permission)
         if not has_permission:
+            # Phase 13 - Logging: Add structured logging for authorization failures
+            import logging
+            logger = logging.getLogger("auth")
+            logger.warning(
+                f"Authorization Failed - UserID: {current_user.id}, Email: {current_user.email}, "
+                f"Required Permission: {self.required_permission}, Decision: Denied"
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Access denied: lack required permission '{self.required_permission}'.",

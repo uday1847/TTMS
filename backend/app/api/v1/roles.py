@@ -24,7 +24,7 @@ def get_role_service(session: AsyncSession = Depends(get_session)) -> RoleServic
     """
     role_repo = SQLAlchemyRoleRepository(session)
     permission_repo = SQLAlchemyPermissionRepository(session)
-    return RoleService(session, role_repo, permission_repo)
+    return RoleService(role_repo, permission_repo)
 
 
 @router.get(
@@ -64,9 +64,7 @@ async def create_role(
     Registers a new authorization role definition in the system.
     """
     role = await role_service.create_role(
-        name=dto.name,
-        display_name=dto.display_name,
-        description=dto.description,
+        dto=dto,
         current_user_id=current_user.id,
     )
     return APIResponse(
@@ -91,7 +89,7 @@ async def delete_role(
     """
     Soft-deletes a role definition.
     """
-    success = await role_service.delete_role(id, current_user_id=current_user.id)
+    success = await role_service.delete_role(role_id=id, deleted_by=current_user.id)
     if not success:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

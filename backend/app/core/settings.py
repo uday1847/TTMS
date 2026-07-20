@@ -20,11 +20,10 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    DEFAULT_ADMIN_PASSWORD: str = "Admin@123"
     RUN_DATABASE_SEED: bool = False
 
     # Utilities
-    CORS_ORIGINS: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    BACKEND_CORS_ORIGINS: list[str] = Field(default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173"])
     TIMEZONE: str = "Asia/Kolkata"
     ACCESS_LOG: bool = True
     SQL_ECHO: bool = False

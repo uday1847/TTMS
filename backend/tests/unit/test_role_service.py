@@ -39,7 +39,7 @@ async def test_get_role_by_id_not_found(role_service, mock_role_repository):
 @pytest.mark.asyncio
 async def test_create_role(role_service, mock_role_repository, mock_permission_repository):
     perm_id = uuid.uuid4()
-    dto = RoleCreate(name="Manager", description="Manage things", permission_ids=[perm_id])
+    dto = RoleCreate(name="Manager", display_name="Manager", description="Manage things", permission_ids=[perm_id])
     
     mock_permission = Permission(id=perm_id, name="manage")
     mock_permission_repository.get_by_ids.return_value = [mock_permission]

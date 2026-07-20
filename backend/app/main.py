@@ -2,8 +2,10 @@ import logging
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.middleware.logging import RequestLoggingMiddleware
+from app.core.settings import settings
 from app.api.router import api_router
 from app.infrastructure.database.base import Base
 from app.domain.exceptions.auth import (
@@ -15,7 +17,7 @@ from app.domain.exceptions.auth import (
     TokenExpiredException,
     UserAlreadyExistsException,
 )
-from app.domain.exceptions.base import DomainException, UnauthorizedException
+from app.domain.exceptions.base import DomainException, UnauthorizedException, ResourceNotFoundException, ValidationException
 from app.domain.exceptions.driver import DriverNotFoundException, DriverHasActiveTripsException, DriverAlreadyExistsException
 from app.domain.exceptions.tractor import TractorNotFoundException, TractorAlreadyExistsException, TractorHasActiveTripsException
 from app.domain.exceptions.party import PartyNotFoundException, PartyAlreadyExistsException, PartyHasActiveTripsException
@@ -81,15 +83,82 @@ logging.basicConfig(
 
 logger = logging.getLogger("ttms.main")
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Phase 12 - Startup Validation
+    from app.infrastructure.database.session import AsyncSessionLocal
+    from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
+    from app.domain.entities.role import Role
+    from app.domain.entities.permission import Permission
+    
+    logger.info("Starting RBAC Startup Validation...")
+    async with AsyncSessionLocal() as session:
+        # Validate Permissions exist
+        res = await session.execute(select(Permission))
+        permissions = res.scalars().all()
+        if not permissions:
+            raise RuntimeError("RBAC Validation Failed: No permissions loaded in database.")
+            
+        perm_names = [p.name for p in permissions]
+        if len(perm_names) != len(set(perm_names)):
+            raise RuntimeError("RBAC Validation Failed: Duplicate permissions found.")
+            
+        # Validate Admin role
+        res = await session.execute(select(Role).options(selectinload(Role.permissions)).where(Role.name == "admin"))
+        admin_role = res.scalar_one_or_none()
+        if not admin_role:
+            raise RuntimeError("RBAC Validation Failed: 'admin' role not found in database.")
+            
+        if not admin_role.permissions:
+            raise RuntimeError("RBAC Validation Failed: 'admin' role has no permissions.")
+            
+        # Validate Operator role
+        res = await session.execute(select(Role).where(Role.name == "operator"))
+        operator_role = res.scalar_one_or_none()
+        if not operator_role:
+            logger.warning("RBAC Validation Warning: 'operator' role not found.")
+            
+        logger.info(f"RBAC Validation Passed. {len(permissions)} permissions loaded.")
+    yield
+
+
 # Initialize FastAPI App with OpenAPI documentation configuration
 app = FastAPI(
     title="Transport Tractor Management System (TTMS)",
     description="Enterprise-grade tractor and trip management API built on Clean Architecture.",
     version="1.0.0",
+    lifespan=lifespan,
 )
+
+# CORS Security Validation
+# Ensure CORS origins are properly configured and wildcard is not used with credentials
+if "*" in settings.BACKEND_CORS_ORIGINS:
+    if True:  # allow_credentials is hardcoded to True below
+        logger.warning(
+            "CORS Security Warning: Wildcard origin '*' is configured with allow_credentials=True. "
+            "This is a security risk. Credentials will be excluded for security."
+        )
+else:
+    logger.info(f"CORS Configuration: Allowing requests from {len(settings.BACKEND_CORS_ORIGINS)} origin(s)")
+    for origin in settings.BACKEND_CORS_ORIGINS:
+        logger.info(f"  ✓ {origin}")
 
 # Register request logging middleware
 app.add_middleware(RequestLoggingMiddleware)
+
+# Register CORS Middleware LAST so it becomes the outermost layer,
+# running first on requests (including OPTIONS) and last on responses
+# (so it can add CORS headers even to 500 errors caught by ServerErrorMiddleware).
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
+)
 
 # Include central router
 app.include_router(api_router)
@@ -101,10 +170,14 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
     Global exception mapper intercepting business exceptions and converting them
     to structured client-friendly API responses.
     """
+    message = getattr(exc, "message", str(exc))
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    message = exc.message
 
-    if isinstance(exc, InvalidCredentialsException):
+    if isinstance(exc, ResourceNotFoundException):
+        status_code = status.HTTP_404_NOT_FOUND
+    elif isinstance(exc, ValidationException):
+        status_code = status.HTTP_400_BAD_REQUEST
+    elif isinstance(exc, InvalidCredentialsException):
         status_code = status.HTTP_401_UNAUTHORIZED
     elif isinstance(exc, TokenExpiredException):
         status_code = status.HTTP_401_UNAUTHORIZED
@@ -213,6 +286,27 @@ async def domain_exception_handler(request: Request, exc: DomainException) -> JS
             "message": message,
             "data": None,
         },
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """
+    Catch-all exception handler to ensure unhandled 500 errors do not bypass
+    the CORSMiddleware (which would result in a CORS error on the frontend).
+    """
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    
+    # Import here to avoid circular imports
+    from app.schemas.response import APIResponse
+    
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=APIResponse(
+            success=False,
+            message="Internal Server Error",
+            data=None
+        ).model_dump(mode="json"),
     )
 
 

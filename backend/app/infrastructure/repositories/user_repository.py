@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.domain.entities.role import Role
 from app.domain.entities.user import User
+from app.domain.entities.user_permission import UserPermission
 from app.domain.repositories.user_repository import UserRepository
 from app.infrastructure.repositories.base_repository import SQLAlchemyBaseRepository
 from app.domain.enums.user_status import UserStatus
@@ -39,7 +40,8 @@ class SQLAlchemyUserRepository(SQLAlchemyBaseRepository[User], UserRepository):
         stmt = (
             select(User)
             .options(
-                selectinload(User.roles).selectinload(Role.permissions)
+                selectinload(User.roles).selectinload(Role.permissions),
+                selectinload(User.direct_permissions).selectinload(UserPermission.permission)
             )
             .where(
                 User.id == user_id,
@@ -73,7 +75,8 @@ class SQLAlchemyUserRepository(SQLAlchemyBaseRepository[User], UserRepository):
         stmt_items = (
             select(User)
             .options(
-                selectinload(User.roles).selectinload(Role.permissions)
+                selectinload(User.roles).selectinload(Role.permissions),
+                selectinload(User.direct_permissions).selectinload(UserPermission.permission)
             )
             .where(
                 User.deleted_at.is_(None),

@@ -97,6 +97,7 @@ import app.domain.entities.role
 import app.domain.entities.permission
 import app.domain.entities.role_permission
 import app.domain.entities.user_role
+import app.domain.entities.user_permission
 import app.domain.entities.refresh_token
 import app.domain.entities.login_history
 import app.domain.entities.password_history

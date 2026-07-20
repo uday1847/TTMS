@@ -122,7 +122,7 @@ async def create_driver(
     """
     Registers a new vehicle driver. Only users with write privilege can access this endpoint.
     """
-    driver = await driver_service.create_driver(dto, current_user_id=current_user.id)
+    driver = await driver_service.create_driver(dto=dto, current_user_id=current_user.id)
     logger.info(
         f"Driver created: id={driver.id} | name={driver.name} | created_by={current_user.id}"
     )
@@ -149,7 +149,7 @@ async def update_driver(
     """
     Updates configuration values of an active driver.
     """
-    driver = await driver_service.update_driver(id, dto, current_user_id=current_user.id)
+    driver = await driver_service.update_driver(driver_id=id, dto=dto, current_user_id=current_user.id)
     
     # Collect list of changed keys for logging
     updated_fields = [k for k, v in dto.model_dump(exclude_unset=True).items()]
@@ -179,7 +179,7 @@ async def delete_driver(
     """
     Soft-deletes a driver profile, checking active trips constraints.
     """
-    await driver_service.delete_driver(id, current_user_id=current_user.id)
+    await driver_service.delete_driver(driver_id=id, current_user_id=current_user.id)
     logger.info(
         f"Driver soft-deleted: id={id} | deleted_by={current_user.id}"
     )
@@ -207,7 +207,7 @@ async def toggle_driver_status(
     Toggles logical is_active status of a driver.
     """
     dto = DriverUpdate(is_active=is_active)
-    driver = await driver_service.update_driver(id, dto, current_user_id=current_user.id)
+    driver = await driver_service.update_driver(driver_id=id, dto=dto, current_user_id=current_user.id)
     logger.info(
         f"Driver status toggled: id={id} | is_active={is_active} | updated_by={current_user.id}"
     )

@@ -1,17 +1,12 @@
-import { createContext, useContext, useEffect } from 'react'
+import * as React from 'react'
 import { useThemeStore } from '@/stores/theme-store'
-import type { Theme } from '@/stores/theme-store'
-
-const ThemeProviderContext = createContext<{
-  theme: Theme
-  setTheme: (theme: Theme) => void
-} | null>(null)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme } = useThemeStore()
+  const { theme } = useThemeStore()
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement
+
     root.classList.remove('light', 'dark')
 
     if (theme === 'system') {
@@ -25,17 +20,5 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.add(theme)
   }, [theme])
 
-  return (
-    <ThemeProviderContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeProviderContext.Provider>
-  )
-}
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext)
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider')
-  }
-  return context
+  return <>{children}</>
 }

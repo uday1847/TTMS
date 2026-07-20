@@ -8,7 +8,7 @@ from app.api.dependencies.permissions import PermissionChecker
 from app.infrastructure.repositories.permission_repository import SQLAlchemyPermissionRepository
 from app.application.services.permission_service import PermissionService
 from app.schemas.response import APIResponse
-from app.schemas.user.permission_response import PermissionResponse
+from app.application.dtos.users import PermissionSummaryDTO
 
 router = APIRouter(prefix="/permissions", tags=["Permissions"])
 
@@ -23,14 +23,14 @@ def get_permission_service(session: AsyncSession = Depends(get_session)) -> Perm
 
 @router.get(
     "",
-    response_model=APIResponse[list[PermissionResponse]],
+    response_model=APIResponse[list[PermissionSummaryDTO]],
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(PermissionChecker("permissions:read"))],
     summary="Get all permissions",
 )
 async def list_permissions(
     permission_service: Annotated[PermissionService, Depends(get_permission_service)],
-) -> APIResponse[list[PermissionResponse]]:
+) -> APIResponse[list[PermissionSummaryDTO]]:
     """
     Lists all defined permissions (system access rights).
     """
@@ -38,5 +38,5 @@ async def list_permissions(
     return APIResponse(
         success=True,
         message="Permissions retrieved successfully.",
-        data=[PermissionResponse.model_validate(p) for p in permissions],
+        data=[PermissionSummaryDTO.model_validate(p) for p in permissions],
     )

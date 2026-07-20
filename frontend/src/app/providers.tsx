@@ -3,6 +3,8 @@ import { queryClient } from '@/lib/query-client'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { Suspense } from 'react'
 
+import { Toaster } from '@/shared/ui/toast/toaster'
+
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <Suspense 
@@ -15,6 +17,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           {children}
+          <Toaster />
         </ThemeProvider>
       </QueryClientProvider>
     </Suspense>

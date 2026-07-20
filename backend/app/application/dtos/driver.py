@@ -1,14 +1,16 @@
+# TODO(contract-cleanup): rename to drivers.py after all imports are migrated.
 from datetime import date, datetime
 from decimal import Decimal
 import uuid
 from typing import Self
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from app.application.dtos.base import BaseDTO
 from app.domain.enums.driver_status import DriverStatus
 
 
-class DriverBase(BaseModel):
+class DriverBase(BaseDTO):
     """
     Shared attributes for driver operations.
     """
@@ -132,7 +134,7 @@ class DriverCreate(DriverBase):
         return self
 
 
-class DriverUpdate(BaseModel):
+class DriverUpdate(BaseDTO):
     """
     Request model for driver update (allows partial updates).
     """
@@ -197,9 +199,9 @@ class DriverResponse(DriverBase):
     """
     id: uuid.UUID
     created_at: datetime
-    updated_at: datetime
-    created_by: uuid.UUID | None
-    updated_by: uuid.UUID | None
+    updated_at: datetime | None = None
+    created_by: uuid.UUID | None = None
+    updated_by: uuid.UUID | None = None
     is_active: bool
     version_id: int
 
@@ -208,7 +210,7 @@ class DriverResponse(DriverBase):
     }
 
 
-class DriverListResponse(BaseModel):
+class DriverListResponse(BaseDTO):
     """
     Paginated driver response list wrapper.
     """

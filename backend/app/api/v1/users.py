@@ -9,9 +9,13 @@ from app.api.dependencies.permissions import PermissionChecker
 from app.domain.entities.user import User
 from app.application.services.user_service import UserService
 from app.schemas.response import APIResponse, PaginatedData
-from app.schemas.user.user_create import UserCreate
-from app.schemas.user.user_response import UserResponse
-from app.schemas.user.user_update import UserUpdate
+from app.application.dtos.users import (
+    UserCreate,
+    UserResponse,
+    UserUpdate,
+    UserRoleUpdate,
+    UserPermissionOverrideUpdate,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -83,18 +87,19 @@ async def get_user(
     summary="Create a new user profile",
 )
 async def create_user(
-    dto: UserCreate,
+    user_data: UserCreate,
     current_user: Annotated[User, Depends(get_current_active_user)],
     user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> APIResponse[UserResponse]:
     """
     Enables administrators to register new users in the system.
     """
-    user = await user_service.register_user(dto, current_user_id=current_user.id)
+    created_user = await user_service.create_user(dto=user_data, current_user_id=current_user.id)
+    
     return APIResponse(
         success=True,
         message="User profile created successfully.",
-        data=UserResponse.model_validate(user),
+        data=created_user,
     )
 
 
@@ -114,11 +119,13 @@ async def update_user(
     """
     Updates profile values of a user.
     """
-    user = await user_service.update_user(id, dto, current_user_id=current_user.id)
+    user = await user_service.update_user(user_id=id, dto=dto, current_user_id=current_user.id)
+    response_dto = await user_service.get_user_with_access_profile(id)
+
     return APIResponse(
         success=True,
         message="User profile updated successfully.",
-        data=UserResponse.model_validate(user),
+        data=UserResponse.model_validate(response_dto),
     )
 
 
@@ -138,11 +145,12 @@ async def patch_user(
     """
     Performs partial updates on user details.
     """
-    user = await user_service.update_user(id, dto, current_user_id=current_user.id)
+    user = await user_service.update_user(user_id=id, dto=dto, current_user_id=current_user.id)
+    response_dto = await user_service.get_user_with_access_profile(id)
     return APIResponse(
         success=True,
         message="User profile updated successfully.",
-        data=UserResponse.model_validate(user),
+        data=UserResponse.model_validate(response_dto),
     )
 
 
@@ -153,23 +161,27 @@ async def patch_user(
     dependencies=[Depends(PermissionChecker("users:delete"))],
     summary="Soft-delete user account",
 )
+
+@router.delete(
+    '/{id}',
+    response_model=APIResponse[None],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionChecker('users:delete'))],
+)
 async def delete_user(
     id: uuid.UUID,
     current_user: Annotated[User, Depends(get_current_active_user)],
     user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> APIResponse[None]:
-    """
-    Soft-deletes a user profile and revokes all active session refresh tokens.
-    """
-    success = await user_service.delete_user(id, current_user_id=current_user.id)
-    if not success:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"success": False, "message": "User not found.", "data": None},
-        )
+
+    await user_service.delete_user(
+        user_id=id,
+        deleted_by=current_user.id,
+    )
+
     return APIResponse(
         success=True,
-        message="User profile has been soft deleted.",
+        message='User deleted successfully.',
         data=None,
     )
 
@@ -219,4 +231,105 @@ async def remove_user_role(
         success=True,
         message=f"Role '{role_name}' removed from user successfully.",
         data=UserResponse.model_validate(user),
+    )
+
+
+@router.get(
+    "/{id}/access-profile",
+    response_model=APIResponse[UserResponse],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionChecker("users:read"))],
+    summary="Get user access profile",
+)
+async def get_user_access_profile(
+    id: uuid.UUID,
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> APIResponse[UserResponse]:
+    """
+    Retrieves a user's full access profile, including roles, effective permissions, and direct overrides.
+    """
+    dto = await user_service.get_user_with_access_profile(id)
+    return APIResponse(
+        success=True,
+        message="User access profile retrieved successfully.",
+        data=dto,
+    )
+
+
+@router.put(
+    "/{id}/roles",
+    response_model=APIResponse[UserResponse],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionChecker("users:role_assign"))],
+    summary="Update user roles",
+)
+async def update_user_roles(
+    id: uuid.UUID,
+    dto: UserRoleUpdate,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> APIResponse[UserResponse]:
+    """
+    Updates the complete list of roles assigned to a user.
+    """
+    user = await user_service.update_user_roles(
+        user_id=id, dto=dto, current_user_id=current_user.id
+    )
+    # Refresh to get populated access profile
+    profile_dto = await user_service.get_user_with_access_profile(id)
+    return APIResponse(
+        success=True,
+        message="User roles updated successfully.",
+        data=profile_dto,
+    )
+
+
+@router.put(
+    "/{id}/permissions",
+    response_model=APIResponse[UserResponse],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionChecker("roles:permission_assign"))],
+    summary="Update user permission overrides",
+)
+async def update_user_permission_overrides(
+    id: uuid.UUID,
+    dto: UserPermissionOverrideUpdate,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> APIResponse[UserResponse]:
+    """
+    Updates direct permission overrides (grants and revocations) for a user.
+    """
+    user = await user_service.update_user_permission_overrides(
+        user_id=id, dto=dto, current_user_id=current_user.id
+    )
+    # Refresh to get populated access profile
+    profile_dto = await user_service.get_user_with_access_profile(id)
+    return APIResponse(
+        success=True,
+        message="User permission overrides updated successfully.",
+        data=profile_dto,
+    )
+
+
+@router.get(
+    "/{id}/effective-permissions",
+    response_model=APIResponse[list[str]],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionChecker("permissions:read"))],
+    summary="Get user effective permissions",
+)
+async def get_effective_permissions(
+    id: uuid.UUID,
+    user_service: Annotated[UserService, Depends(get_user_service)],
+) -> APIResponse[list[str]]:
+    """
+    Returns a flat list of effective permissions for a user.
+    """
+    user = await user_service.get_user_by_id(id)
+    perms = user_service._calculate_effective_permissions(user)
+    return APIResponse(
+        success=True,
+        message="Effective permissions retrieved successfully.",
+        data=perms,
     )

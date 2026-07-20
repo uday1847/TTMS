@@ -1,0 +1,6453 @@
+{
+  "main.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "domain_exception_handler"
+      },
+      {
+        "name": "root"
+      }
+    ],
+    "imports": [
+      "app.domain.exceptions.party",
+      "app.domain.exceptions.maintenance",
+      "logging",
+      "app.domain.exceptions.invoice_payment",
+      "app.domain.exceptions.base",
+      "app.domain.exceptions.tractor",
+      "app.api.middleware.logging",
+      "app.domain.exceptions.trip_expense",
+      "app.domain.exceptions.fuel",
+      "fastapi",
+      "app.domain.exceptions.invoice",
+      "app.domain.exceptions.trip",
+      "app.domain.exceptions.driver",
+      "fastapi.responses",
+      "app.api.router",
+      "app.infrastructure.database.base",
+      "app.domain.exceptions.auth"
+    ]
+  },
+  "api\\router.py": {
+    "classes": [],
+    "functions": [],
+    "imports": [
+      "app.api.v1.trip_expenses",
+      "app.api.v1.fuel_vendors",
+      "app.api.v1.trips",
+      "app.api.v1.users",
+      "app.api.v1.permissions",
+      "app.api.v1.sessions",
+      "app.api.v1.roles",
+      "app.api.v1.maintenances",
+      "app.api.v1.invoice_payments",
+      "fastapi",
+      "app.api.v1.audit",
+      "app.api.v1.parties",
+      "app.api.v1.login_history",
+      "app.api.v1.reports",
+      "app.api.v1.auth",
+      "app.api.v1.fuel_transactions",
+      "app.api.v1.invoices",
+      "app.api.v1.drivers",
+      "app.api.v1.tractors"
+    ]
+  },
+  "api\\dependencies\\auth.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_user_service"
+      },
+      {
+        "name": "get_current_user"
+      },
+      {
+        "name": "get_current_active_user"
+      }
+    ],
+    "imports": [
+      "fastapi.security",
+      "app.domain.entities.user",
+      "app.infrastructure.repositories.role_repository",
+      "fastapi",
+      "sqlalchemy.ext.asyncio",
+      "app.application.services.jwt_service",
+      "app.infrastructure.repositories.user_repository",
+      "app.application.validators.auth_validator",
+      "app.application.services.user_service",
+      "app.core.security",
+      "app.api.dependencies.db",
+      "app.domain.exceptions.auth",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\dependencies\\db.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_session"
+      }
+    ],
+    "imports": [
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.database.session",
+      "typing"
+    ]
+  },
+  "api\\dependencies\\permissions.py": {
+    "classes": [
+      {
+        "name": "PermissionChecker",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "__call__"
+        ]
+      },
+      {
+        "name": "RoleChecker",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "__call__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "fastapi",
+      "app.application.services.user_service",
+      "typing"
+    ]
+  },
+  "api\\middleware\\logging.py": {
+    "classes": [
+      {
+        "name": "RequestLoggingMiddleware",
+        "bases": [
+          "BaseHTTPMiddleware"
+        ],
+        "methods": [
+          "dispatch"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "starlette.middleware.base",
+      "time",
+      "logging",
+      "fastapi"
+    ]
+  },
+  "api\\v1\\audit.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_audit_logs"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.infrastructure.repositories.audit_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.dtos.audit",
+      "sqlalchemy.ext.asyncio",
+      "app.api.dependencies.db",
+      "uuid"
+    ]
+  },
+  "api\\v1\\auth.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_session_service"
+      },
+      {
+        "name": "get_auth_service"
+      },
+      {
+        "name": "login"
+      },
+      {
+        "name": "login_for_access_token"
+      },
+      {
+        "name": "change_password"
+      }
+    ],
+    "imports": [
+      "fastapi.security",
+      "app.infrastructure.repositories.password_history_repository",
+      "app.infrastructure.repositories.session_repository",
+      "app.application.services.session_service",
+      "fastapi",
+      "app.application.services.authentication_service",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.login_history_repository",
+      "app.infrastructure.repositories.user_repository",
+      "app.application.dtos.auth",
+      "app.api.dependencies.db",
+      "uuid"
+    ]
+  },
+  "api\\v1\\drivers.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_driver_service"
+      },
+      {
+        "name": "list_drivers"
+      },
+      {
+        "name": "get_driver"
+      },
+      {
+        "name": "create_driver"
+      },
+      {
+        "name": "update_driver"
+      },
+      {
+        "name": "delete_driver"
+      },
+      {
+        "name": "toggle_driver_status"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "logging",
+      "app.infrastructure.repositories.driver_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "sqlalchemy.ext.asyncio",
+      "app.application.services.driver_service",
+      "app.application.dtos.driver",
+      "app.schemas.response",
+      "fastapi.responses",
+      "app.api.dependencies.db",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\fuel_transactions.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_fuel_service"
+      },
+      {
+        "name": "get_fuel_analytics_service"
+      },
+      {
+        "name": "create_fuel_transaction"
+      },
+      {
+        "name": "list_fuel_transactions"
+      },
+      {
+        "name": "get_fuel_transaction"
+      },
+      {
+        "name": "update_fuel_transaction"
+      },
+      {
+        "name": "update_fuel_status"
+      },
+      {
+        "name": "get_tractor_fuel_analytics"
+      },
+      {
+        "name": "get_trip_fuel_analytics"
+      }
+    ],
+    "imports": [
+      "datetime",
+      "app.api.dependencies.auth",
+      "app.infrastructure.repositories.driver_repository",
+      "app.infrastructure.repositories.tractor_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.infrastructure.repositories.trip_expense_repository",
+      "app.infrastructure.repositories.fuel_repository",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.fuel_vendor_repository",
+      "app.domain.enums.fuel_transaction_status",
+      "app.infrastructure.repositories.trip_repository",
+      "app.application.services.fuel_analytics_service",
+      "app.api.dependencies.db",
+      "app.application.dtos.fuel",
+      "uuid",
+      "app.application.services.fuel_service",
+      "typing"
+    ]
+  },
+  "api\\v1\\fuel_vendors.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_fuel_vendor_service"
+      },
+      {
+        "name": "create_fuel_vendor"
+      },
+      {
+        "name": "list_fuel_vendors"
+      },
+      {
+        "name": "get_fuel_vendor"
+      },
+      {
+        "name": "update_fuel_vendor"
+      },
+      {
+        "name": "delete_fuel_vendor"
+      }
+    ],
+    "imports": [
+      "app.api.dependencies.auth",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.dtos.fuel_vendor",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.fuel_vendor_repository",
+      "app.application.services.fuel_vendor_service",
+      "app.api.dependencies.db",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\invoices.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_invoice_service"
+      },
+      {
+        "name": "map_invoice_response"
+      },
+      {
+        "name": "create_invoice"
+      },
+      {
+        "name": "get_invoice_dashboard"
+      },
+      {
+        "name": "get_invoice_summary"
+      },
+      {
+        "name": "get_overdue_invoices_list"
+      },
+      {
+        "name": "get_pending_invoices_list"
+      },
+      {
+        "name": "get_invoices_by_party"
+      },
+      {
+        "name": "get_invoice_by_trip"
+      },
+      {
+        "name": "list_invoices"
+      },
+      {
+        "name": "get_invoice"
+      },
+      {
+        "name": "get_invoice_history"
+      },
+      {
+        "name": "update_invoice"
+      },
+      {
+        "name": "update_invoice_status"
+      },
+      {
+        "name": "record_invoice_payment"
+      },
+      {
+        "name": "delete_invoice"
+      }
+    ],
+    "imports": [
+      "app.api.dependencies.auth",
+      "app.domain.entities.invoice",
+      "app.application.dtos.invoice",
+      "logging",
+      "app.application.services.invoice_service",
+      "fastapi.responses",
+      "app.api.dependencies.db",
+      "fastapi",
+      "app.application.services.invoice_number_generator",
+      "app.infrastructure.repositories.trip_repository",
+      "app.infrastructure.repositories.invoice_repository",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing",
+      "datetime",
+      "app.domain.entities.user",
+      "app.domain.enums.invoice_status",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.schemas.response",
+      "app.api.dependencies.permissions"
+    ]
+  },
+  "api\\v1\\invoice_payments.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_invoice_payment_service"
+      },
+      {
+        "name": "get_receipt_service"
+      },
+      {
+        "name": "map_payment_response"
+      },
+      {
+        "name": "get_dashboard"
+      },
+      {
+        "name": "create_payment"
+      },
+      {
+        "name": "list_payments"
+      },
+      {
+        "name": "get_payment"
+      },
+      {
+        "name": "get_receipt"
+      },
+      {
+        "name": "update_payment"
+      },
+      {
+        "name": "delete_payment"
+      },
+      {
+        "name": "restore_payment"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.infrastructure.repositories.invoice_repository",
+      "app.application.services.invoice_payment_service",
+      "app.api.dependencies.db",
+      "fastapi",
+      "app.infrastructure.repositories.invoice_payment_repository",
+      "app.infrastructure.database.session",
+      "app.application.services.receipt_service",
+      "app.schemas.response",
+      "app.domain.entities.invoice_payment",
+      "app.application.dtos.invoice_payment",
+      "app.api.dependencies.permissions",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\login_history.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_login_history"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.dtos.audit",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.login_history_repository",
+      "app.api.dependencies.db",
+      "uuid"
+    ]
+  },
+  "api\\v1\\maintenances.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_maintenance_service"
+      },
+      {
+        "name": "create_maintenance"
+      },
+      {
+        "name": "get_dashboard"
+      },
+      {
+        "name": "get_upcoming_services"
+      },
+      {
+        "name": "get_overdue_services"
+      },
+      {
+        "name": "list_maintenances"
+      },
+      {
+        "name": "get_maintenance"
+      },
+      {
+        "name": "get_maintenance_history"
+      },
+      {
+        "name": "update_maintenance"
+      },
+      {
+        "name": "update_maintenance_status"
+      },
+      {
+        "name": "delete_maintenance"
+      },
+      {
+        "name": "restore_maintenance"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.domain.enums.maintenance_priority",
+      "app.application.dtos.maintenance",
+      "app.api.dependencies.db",
+      "app.infrastructure.repositories.maintenance_repository",
+      "app.infrastructure.repositories.tractor_repository",
+      "fastapi",
+      "app.application.services.maintenance_service",
+      "app.infrastructure.database.session",
+      "app.schemas.response",
+      "app.domain.enums.maintenance_type",
+      "app.domain.enums.maintenance_status",
+      "app.api.dependencies.permissions",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\parties.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_party_service"
+      },
+      {
+        "name": "list_parties"
+      },
+      {
+        "name": "get_party"
+      },
+      {
+        "name": "create_party"
+      },
+      {
+        "name": "update_party"
+      },
+      {
+        "name": "toggle_party_status"
+      },
+      {
+        "name": "delete_party"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "logging",
+      "app.application.services.party_service",
+      "app.application.dtos.party",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.party_repository",
+      "app.schemas.response",
+      "fastapi.responses",
+      "app.api.dependencies.db",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\permissions.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_permission_service"
+      },
+      {
+        "name": "list_permissions"
+      }
+    ],
+    "imports": [
+      "app.application.services.permission_service",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "sqlalchemy.ext.asyncio",
+      "app.schemas.user.permission_response",
+      "app.schemas.response",
+      "app.infrastructure.repositories.permission_repository",
+      "app.api.dependencies.db",
+      "typing"
+    ]
+  },
+  "api\\v1\\reports.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_report_service"
+      },
+      {
+        "name": "get_dashboard_kpis"
+      },
+      {
+        "name": "get_dashboard_summary"
+      },
+      {
+        "name": "get_revenue_chart"
+      },
+      {
+        "name": "get_expense_chart"
+      },
+      {
+        "name": "get_fuel_analytics"
+      },
+      {
+        "name": "get_maintenance_analytics"
+      },
+      {
+        "name": "get_tractor_profitability"
+      },
+      {
+        "name": "get_driver_performance"
+      },
+      {
+        "name": "get_party_analytics"
+      },
+      {
+        "name": "get_media_type"
+      },
+      {
+        "name": "get_extension"
+      },
+      {
+        "name": "export_dashboard"
+      },
+      {
+        "name": "export_trips"
+      },
+      {
+        "name": "export_fuel"
+      },
+      {
+        "name": "export_profitability"
+      }
+    ],
+    "imports": [
+      "app.application.services.report_export_service",
+      "datetime",
+      "app.api.dependencies.auth",
+      "app.infrastructure.repositories.dashboard_repository",
+      "app.infrastructure.repositories.fleet_report_repository",
+      "app.infrastructure.repositories.fuel_report_repository",
+      "app.infrastructure.repositories.trip_report_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.dtos.reports",
+      "app.infrastructure.repositories.maintenance_report_repository",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.financial_report_repository",
+      "app.application.services.report_service",
+      "app.api.dependencies.db",
+      "app.infrastructure.repositories.party_report_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\roles.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_role_service"
+      },
+      {
+        "name": "list_roles"
+      },
+      {
+        "name": "create_role"
+      },
+      {
+        "name": "delete_role"
+      },
+      {
+        "name": "assign_role_permission"
+      },
+      {
+        "name": "remove_role_permission"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.infrastructure.repositories.role_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.services.role_service",
+      "sqlalchemy.ext.asyncio",
+      "app.schemas.response",
+      "app.schemas.user.role_response",
+      "fastapi.responses",
+      "app.infrastructure.repositories.permission_repository",
+      "app.api.dependencies.db",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\sessions.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_session_service"
+      },
+      {
+        "name": "get_sessions"
+      },
+      {
+        "name": "revoke_session"
+      },
+      {
+        "name": "revoke_all_sessions"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.services.session_service",
+      "app.application.dtos.audit",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.repositories.session_repository",
+      "app.api.dependencies.db",
+      "uuid"
+    ]
+  },
+  "api\\v1\\tractors.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_tractor_service"
+      },
+      {
+        "name": "list_tractors"
+      },
+      {
+        "name": "get_tractor"
+      },
+      {
+        "name": "create_tractor"
+      },
+      {
+        "name": "update_tractor"
+      },
+      {
+        "name": "toggle_tractor_status"
+      },
+      {
+        "name": "delete_tractor"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "logging",
+      "app.infrastructure.repositories.tractor_repository",
+      "app.api.dependencies.permissions",
+      "fastapi",
+      "app.application.dtos.tractor",
+      "sqlalchemy.ext.asyncio",
+      "app.schemas.response",
+      "fastapi.responses",
+      "app.application.services.tractor_service",
+      "app.api.dependencies.db",
+      "uuid",
+      "typing"
+    ]
+  },
+  "api\\v1\\trips.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_trip_service"
+      },
+      {
+        "name": "map_trip_response"
+      },
+      {
+        "name": "list_trips"
+      },
+      {
+        "name": "list_active_trips"
+      },
+      {
+        "name": "list_completed_trips"
+      },
+      {
+        "name": "list_pending_trips"
+      },
+      {
+        "name": "get_trip"
+      },
+      {
+        "name": "create_trip"
+      },
+      {
+        "name": "update_trip"
+      },
+      {
+        "name": "shift_trip_status"
+      },
+      {
+        "name": "get_trip_history"
+      },
+      {
+        "name": "delete_trip"
+      }
+    ],
+    "imports": [
+      "app.api.dependencies.auth",
+      "app.application.services.trip_service",
+      "logging",
+      "app.domain.enums.trip_status",
+      "fastapi.responses",
+      "app.api.dependencies.db",
+      "fastapi",
+      "app.infrastructure.repositories.trip_repository",
+      "uuid",
+      "typing",
+      "datetime",
+      "app.domain.entities.user",
+      "app.application.dtos.trip",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.enums.expense_type",
+      "app.schemas.response",
+      "app.api.dependencies.permissions"
+    ]
+  },
+  "api\\v1\\trip_expenses.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_trip_expense_service"
+      },
+      {
+        "name": "map_expense_response"
+      },
+      {
+        "name": "create_trip_expense"
+      },
+      {
+        "name": "list_trip_expenses"
+      },
+      {
+        "name": "get_trip_expense"
+      },
+      {
+        "name": "update_trip_expense"
+      },
+      {
+        "name": "delete_trip_expense"
+      },
+      {
+        "name": "get_expenses_for_trip"
+      },
+      {
+        "name": "get_trip_expense_summary"
+      },
+      {
+        "name": "get_trip_profit"
+      },
+      {
+        "name": "get_trip_dashboard"
+      }
+    ],
+    "imports": [
+      "app.api.dependencies.auth",
+      "logging",
+      "app.infrastructure.repositories.trip_expense_repository",
+      "fastapi.responses",
+      "app.domain.entities.trip_expense",
+      "app.application.services.expense_number_generator",
+      "app.application.dtos.trip_expense",
+      "app.api.dependencies.db",
+      "app.domain.enums.payment_mode",
+      "fastapi",
+      "app.infrastructure.repositories.trip_repository",
+      "app.application.services.trip_expense_service",
+      "uuid",
+      "typing",
+      "datetime",
+      "app.domain.entities.user",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.enums.expense_type",
+      "app.schemas.response",
+      "app.api.dependencies.permissions"
+    ]
+  },
+  "api\\v1\\users.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "list_users"
+      },
+      {
+        "name": "get_user"
+      },
+      {
+        "name": "create_user"
+      },
+      {
+        "name": "update_user"
+      },
+      {
+        "name": "patch_user"
+      },
+      {
+        "name": "delete_user"
+      },
+      {
+        "name": "assign_user_role"
+      },
+      {
+        "name": "remove_user_role"
+      }
+    ],
+    "imports": [
+      "app.domain.entities.user",
+      "app.api.dependencies.auth",
+      "fastapi",
+      "app.schemas.user.user_response",
+      "app.schemas.user.user_update",
+      "app.schemas.response",
+      "fastapi.responses",
+      "app.application.services.user_service",
+      "app.schemas.user.user_create",
+      "app.api.dependencies.permissions",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\audit.py": {
+    "classes": [
+      {
+        "name": "AuditResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "LoginHistoryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "SessionResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.session_status",
+      "app.domain.enums.permission_module",
+      "app.domain.enums.login_result",
+      "pydantic",
+      "app.domain.enums.audit_action",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\auth.py": {
+    "classes": [
+      {
+        "name": "LoginRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "LoginResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "RefreshTokenRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "CurrentUserResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ChangePasswordRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ForgotPasswordRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ResetPasswordRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "uuid",
+      "pydantic"
+    ]
+  },
+  "application\\dtos\\driver.py": {
+    "classes": [
+      {
+        "name": "DriverBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input"
+        ]
+      },
+      {
+        "name": "DriverCreate",
+        "bases": [
+          "DriverBase"
+        ],
+        "methods": [
+          "validate_license_expiry",
+          "validate_phones"
+        ]
+      },
+      {
+        "name": "DriverUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_license_expiry",
+          "validate_phones"
+        ]
+      },
+      {
+        "name": "DriverResponse",
+        "bases": [
+          "DriverBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "DriverListResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "decimal",
+      "app.domain.enums.driver_status",
+      "pydantic",
+      "re",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\fuel.py": {
+    "classes": [
+      {
+        "name": "FuelTransactionBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelTransactionCreate",
+        "bases": [
+          "FuelTransactionBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelTransactionUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelHistoryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelTransactionResponse",
+        "bases": [
+          "FuelTransactionBase"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.fuel_type",
+      "datetime",
+      "app.domain.enums.fuel_payment_mode",
+      "decimal",
+      "app.domain.enums.fuel_transaction_status",
+      "pydantic",
+      "app.domain.enums.fuel_station_type",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\fuel_vendor.py": {
+    "classes": [
+      {
+        "name": "FuelVendorBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelVendorCreate",
+        "bases": [
+          "FuelVendorBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelVendorUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelVendorResponse",
+        "bases": [
+          "FuelVendorBase"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "uuid",
+      "pydantic",
+      "typing"
+    ]
+  },
+  "application\\dtos\\invoice.py": {
+    "classes": [
+      {
+        "name": "InvoiceBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "validate_dates",
+          "trim_remarks"
+        ]
+      },
+      {
+        "name": "InvoiceCreate",
+        "bases": [
+          "InvoiceBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "trim_remarks"
+        ]
+      },
+      {
+        "name": "InvoiceStatusUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "trim_remarks"
+        ]
+      },
+      {
+        "name": "InvoiceResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceStatusHistoryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceSummaryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceFinancialPeriodMetrics",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceDashboardResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.invoice_status",
+      "decimal",
+      "pydantic",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\invoice_payment.py": {
+    "classes": [
+      {
+        "name": "InvoicePaymentBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "strip_strings"
+        ]
+      },
+      {
+        "name": "InvoicePaymentCreate",
+        "bases": [
+          "InvoicePaymentBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoicePaymentUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoicePaymentResponse",
+        "bases": [
+          "InvoicePaymentBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ReceiptResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoicePaymentDashboardResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.payment_status",
+      "decimal",
+      "app.domain.enums.payment_source",
+      "pydantic",
+      "uuid"
+    ]
+  },
+  "application\\dtos\\maintenance.py": {
+    "classes": [
+      {
+        "name": "MaintenanceBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_dates",
+          "validate_odometer"
+        ]
+      },
+      {
+        "name": "MaintenanceCreate",
+        "bases": [
+          "MaintenanceBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceStatusUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceResponse",
+        "bases": [
+          "MaintenanceBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceHistoryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceDashboardResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.maintenance_priority",
+      "decimal",
+      "app.domain.enums.maintenance_type",
+      "pydantic",
+      "app.domain.enums.maintenance_status",
+      "re",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\party.py": {
+    "classes": [
+      {
+        "name": "PartyBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_party_type",
+          "validate_email_format",
+          "validate_gst_format",
+          "validate_pan_format"
+        ]
+      },
+      {
+        "name": "PartyCreate",
+        "bases": [
+          "PartyBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "PartyUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_party_type",
+          "validate_email_format",
+          "validate_gst_format",
+          "validate_pan_format"
+        ]
+      },
+      {
+        "name": "PartyResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "decimal",
+      "pydantic",
+      "re",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\permissions.py": {
+    "classes": [
+      {
+        "name": "PermissionResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "pydantic",
+      "app.domain.enums.permission_module"
+    ]
+  },
+  "application\\dtos\\reports.py": {
+    "classes": [
+      {
+        "name": "DashboardKPIResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "RevenueChartResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ExpenseChartResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "FuelAnalyticsResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "MaintenanceAnalyticsResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TractorProfitabilityResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "DriverPerformanceResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "PartyAnalyticsResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "DashboardSummaryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "decimal",
+      "pydantic",
+      "typing"
+    ]
+  },
+  "application\\dtos\\roles.py": {
+    "classes": [
+      {
+        "name": "RoleCreate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "RoleUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "RoleResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.role_type",
+      "uuid",
+      "pydantic"
+    ]
+  },
+  "application\\dtos\\tractor.py": {
+    "classes": [
+      {
+        "name": "TractorBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input"
+        ]
+      },
+      {
+        "name": "TractorCreate",
+        "bases": [
+          "TractorBase"
+        ],
+        "methods": [
+          "validate_insurance_expiry"
+        ]
+      },
+      {
+        "name": "TractorUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_insurance_expiry"
+        ]
+      },
+      {
+        "name": "TractorResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "pydantic",
+      "re",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\trip.py": {
+    "classes": [
+      {
+        "name": "TripBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input",
+          "validate_amounts_and_dates"
+        ]
+      },
+      {
+        "name": "TripCreate",
+        "bases": [
+          "TripBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "normalize_input"
+        ]
+      },
+      {
+        "name": "TripStatusUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripStatusHistoryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "decimal",
+      "app.domain.enums.trip_status",
+      "pydantic",
+      "re",
+      "uuid"
+    ]
+  },
+  "application\\dtos\\trip_expense.py": {
+    "classes": [
+      {
+        "name": "TripExpenseBase",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "trim_strings"
+        ]
+      },
+      {
+        "name": "TripExpenseCreate",
+        "bases": [
+          "TripExpenseBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripExpenseUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": [
+          "trim_strings"
+        ]
+      },
+      {
+        "name": "TripExpenseResponse",
+        "bases": [
+          "TripExpenseBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ExpenseBreakdownItem",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripExpenseSummaryResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripDashboardResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.payment_mode",
+      "datetime",
+      "app.domain.enums.payment_status",
+      "app.application.dtos.trip",
+      "decimal",
+      "app.domain.enums.expense_type",
+      "pydantic",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\dtos\\users.py": {
+    "classes": [
+      {
+        "name": "UserCreate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "UserUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "UserResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "UserDashboardResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "BulkUserCreate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "BulkUserAction",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "typing",
+      "pydantic",
+      "uuid",
+      "app.domain.enums.user_status"
+    ]
+  },
+  "application\\services\\audit_service.py": {
+    "classes": [
+      {
+        "name": "AuditService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "log_action"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.permission_module",
+      "app.domain.entities.audit_log",
+      "app.domain.repositories.audit_repository",
+      "uuid",
+      "app.domain.enums.audit_action",
+      "typing"
+    ]
+  },
+  "application\\services\\authentication_service.py": {
+    "classes": [
+      {
+        "name": "AuthenticationService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "login",
+          "change_password"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.exceptions.base",
+      "app.application.services.session_service",
+      "app.domain.repositories.password_history_repository",
+      "app.application.services.jwt_service",
+      "app.domain.repositories.user_repository",
+      "app.domain.enums.login_result",
+      "app.domain.entities.password_history",
+      "app.application.dtos.auth",
+      "app.core.security",
+      "app.domain.repositories.login_history_repository",
+      "app.domain.entities.login_history",
+      "uuid",
+      "app.domain.enums.user_status"
+    ]
+  },
+  "application\\services\\auth_service.py": {
+    "classes": [
+      {
+        "name": "AuthService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "login",
+          "logout",
+          "refresh_token",
+          "change_password",
+          "forgot_password",
+          "reset_password"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.schemas.auth.change_password",
+      "datetime",
+      "app.schemas.auth.login_request",
+      "logging",
+      "app.domain.entities.refresh_token",
+      "app.application.validators.password_validator",
+      "app.schemas.auth.login_response",
+      "app.schemas.auth.reset_password",
+      "app.schemas.auth.refresh_request",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.repositories.user_repository",
+      "app.schemas.auth.refresh_response",
+      "app.core.security",
+      "app.domain.exceptions.auth",
+      "uuid",
+      "app.domain.repositories.refresh_token_repository",
+      "typing"
+    ]
+  },
+  "application\\services\\dashboard_cache_service.py": {
+    "classes": [
+      {
+        "name": "DashboardCacheService",
+        "bases": [],
+        "methods": [
+          "get",
+          "set",
+          "delete",
+          "clear",
+          "invalidate_prefix",
+          "invalidate_dashboard",
+          "invalidate_financial",
+          "invalidate_fleet",
+          "invalidate_fuel",
+          "invalidate_maintenance"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "time",
+      "typing"
+    ]
+  },
+  "application\\services\\driver_service.py": {
+    "classes": [
+      {
+        "name": "DriverService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_driver",
+          "get_driver_by_id",
+          "get_all_drivers",
+          "update_driver",
+          "delete_driver",
+          "paginate_drivers"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.application.dtos.driver",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.enums.driver_status",
+      "app.domain.repositories.driver_repository",
+      "app.domain.exceptions.driver",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\expense_number_generator.py": {
+    "classes": [
+      {
+        "name": "ExpenseNumberGenerator",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.trip_expense_repository"
+    ]
+  },
+  "application\\services\\fuel_analytics_service.py": {
+    "classes": [
+      {
+        "name": "FuelAnalyticsService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "calculate_tractor_stats",
+          "calculate_trip_stats"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "decimal",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.fuel_transaction",
+      "typing"
+    ]
+  },
+  "application\\services\\fuel_number_generator.py": {
+    "classes": [
+      {
+        "name": "FuelNumberGenerator",
+        "bases": [],
+        "methods": [
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.fuel_transaction",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio"
+    ]
+  },
+  "application\\services\\fuel_service.py": {
+    "classes": [
+      {
+        "name": "FuelService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "_calculate_kmpl_and_distance",
+          "create_transaction",
+          "_create_linked_expense",
+          "get_transaction",
+          "get_transactions",
+          "count_transactions",
+          "update_transaction",
+          "change_status"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.fuel",
+      "app.domain.repositories.fuel_vendor_repository",
+      "app.domain.repositories.fuel_repository",
+      "app.domain.repositories.driver_repository",
+      "app.domain.entities.trip_expense",
+      "app.application.services.expense_number_generator",
+      "app.domain.repositories.trip_repository",
+      "app.application.dtos.fuel",
+      "app.domain.repositories.trip_expense_repository",
+      "app.application.services.fuel_number_generator",
+      "app.domain.repositories.tractor_repository",
+      "uuid",
+      "typing",
+      "datetime",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.enums.fuel_transaction_status",
+      "app.domain.enums.expense_type",
+      "app.domain.entities.fuel_history",
+      "app.domain.entities.fuel_transaction"
+    ]
+  },
+  "application\\services\\fuel_vendor_service.py": {
+    "classes": [
+      {
+        "name": "FuelVendorService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_vendor",
+          "get_vendor",
+          "get_vendors",
+          "count_vendors",
+          "update_vendor",
+          "delete_vendor"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.fuel",
+      "app.application.dtos.fuel_vendor",
+      "app.domain.repositories.fuel_vendor_repository",
+      "app.domain.entities.fuel_vendor",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\invoice_number_generator.py": {
+    "classes": [
+      {
+        "name": "InvoiceNumberGenerator",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.invoice_repository",
+      "datetime"
+    ]
+  },
+  "application\\services\\invoice_payment_service.py": {
+    "classes": [
+      {
+        "name": "InvoicePaymentService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "_recalculate_invoice_totals",
+          "create_payment",
+          "get_payment",
+          "list_payments",
+          "update_payment",
+          "delete_payment",
+          "restore_payment",
+          "get_dashboard_metrics",
+          "get_payment_source_breakdown"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.invoice_status",
+      "app.domain.exceptions.invoice_payment",
+      "app.application.services.receipt_number_generator",
+      "app.domain.entities.invoice",
+      "app.domain.enums.payment_status",
+      "app.domain.exceptions.invoice",
+      "decimal",
+      "app.domain.entities.invoice_payment_history",
+      "app.domain.repositories.invoice_payment_repository",
+      "app.domain.repositories.invoice_repository",
+      "app.domain.entities.invoice_payment",
+      "app.application.dtos.invoice_payment",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\invoice_service.py": {
+    "classes": [
+      {
+        "name": "InvoiceService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_invoice",
+          "update_invoice",
+          "update_status",
+          "record_payment",
+          "delete_invoice",
+          "get_invoice_by_id"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.invoice_status",
+      "app.application.dtos.invoice",
+      "app.domain.entities.invoice",
+      "app.domain.exceptions.invoice",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.exceptions.trip",
+      "app.application.services.invoice_number_generator",
+      "app.domain.repositories.invoice_repository",
+      "app.domain.repositories.trip_repository",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\jwt_service.py": {
+    "classes": [
+      {
+        "name": "JWTService",
+        "bases": [],
+        "methods": [
+          "create_access_token",
+          "create_refresh_token",
+          "verify_token"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "jose",
+      "app.core.security",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\maintenance_number_generator.py": {
+    "classes": [
+      {
+        "name": "MaintenanceNumberGenerator",
+        "bases": [],
+        "methods": [
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.maintenance",
+      "sqlalchemy"
+    ]
+  },
+  "application\\services\\maintenance_service.py": {
+    "classes": [
+      {
+        "name": "MaintenanceService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "_calculate_total_cost",
+          "create_maintenance",
+          "update_maintenance",
+          "update_status",
+          "get_maintenance",
+          "search_maintenances",
+          "get_dashboard",
+          "get_upcoming_services",
+          "get_overdue_services",
+          "delete_maintenance",
+          "restore_maintenance"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.maintenance",
+      "app.domain.entities.maintenance_history",
+      "app.domain.exceptions.tractor",
+      "app.application.dtos.maintenance",
+      "decimal",
+      "app.application.services.maintenance_number_generator",
+      "app.infrastructure.database.session",
+      "app.domain.exceptions.trip",
+      "app.domain.repositories.maintenance_repository",
+      "app.domain.entities.maintenance",
+      "app.domain.enums.maintenance_status",
+      "app.domain.enums.tractor_status",
+      "app.domain.repositories.tractor_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\party_service.py": {
+    "classes": [
+      {
+        "name": "PartyService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_party",
+          "get_party_by_id",
+          "get_all_parties",
+          "update_party",
+          "delete_party",
+          "paginate_parties"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.party",
+      "datetime",
+      "app.domain.entities.party",
+      "app.application.dtos.party",
+      "sqlalchemy.ext.asyncio",
+      "uuid",
+      "app.domain.repositories.party_repository",
+      "typing"
+    ]
+  },
+  "application\\services\\permission_cache_service.py": {
+    "classes": [
+      {
+        "name": "PermissionCacheService",
+        "bases": [],
+        "methods": [
+          "get",
+          "set",
+          "invalidate",
+          "invalidate_user_permissions",
+          "invalidate_all_permissions"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "time",
+      "typing"
+    ]
+  },
+  "application\\services\\permission_service.py": {
+    "classes": [
+      {
+        "name": "PermissionService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_permission",
+          "get_all_permissions"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.permission_repository",
+      "logging",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.permission",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\receipt_number_generator.py": {
+    "classes": [
+      {
+        "name": "ReceiptNumberGenerator",
+        "bases": [],
+        "methods": [
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.infrastructure.database.session",
+      "app.domain.entities.invoice_payment",
+      "sqlalchemy"
+    ]
+  },
+  "application\\services\\receipt_service.py": {
+    "classes": [
+      {
+        "name": "ReceiptService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "generate_receipt_json"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.application.dtos.invoice_payment",
+      "app.domain.exceptions.invoice_payment",
+      "app.domain.repositories.invoice_payment_repository",
+      "uuid"
+    ]
+  },
+  "application\\services\\report_export_service.py": {
+    "classes": [
+      {
+        "name": "ReportExportService",
+        "bases": [],
+        "methods": [
+          "_export_csv",
+          "_export_excel",
+          "_export_pdf",
+          "export_data",
+          "export_dashboard",
+          "export_trips",
+          "export_fuel",
+          "export_profitability"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "io",
+      "openpyxl",
+      "csv",
+      "typing"
+    ]
+  },
+  "application\\services\\report_service.py": {
+    "classes": [
+      {
+        "name": "ReportService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "get_dashboard_kpis",
+          "get_revenue_chart",
+          "get_expense_chart",
+          "get_fuel_analytics",
+          "get_maintenance_analytics",
+          "get_tractor_profitability",
+          "get_driver_performance",
+          "get_party_analytics",
+          "get_trip_statistics",
+          "get_dashboard_summary"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.application.services.dashboard_cache_service",
+      "app.domain.repositories.fuel_report_repository",
+      "decimal",
+      "app.domain.repositories.maintenance_report_repository",
+      "app.domain.repositories.financial_report_repository",
+      "app.domain.repositories.fleet_report_repository",
+      "app.domain.repositories.trip_report_repository",
+      "app.domain.repositories.dashboard_repository",
+      "app.domain.repositories.party_report_repository",
+      "typing"
+    ]
+  },
+  "application\\services\\role_service.py": {
+    "classes": [
+      {
+        "name": "RoleService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "get_role_by_id",
+          "list_roles",
+          "create_role",
+          "update_role",
+          "delete_role"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.permission_repository",
+      "app.application.services.permission_cache_service",
+      "app.domain.exceptions.base",
+      "app.application.dtos.roles",
+      "app.domain.repositories.role_repository",
+      "app.domain.entities.role",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\session_service.py": {
+    "classes": [
+      {
+        "name": "SessionService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_session",
+          "revoke_session",
+          "revoke_all_sessions"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.session_repository",
+      "app.domain.entities.user_session",
+      "app.core.security",
+      "uuid"
+    ]
+  },
+  "application\\services\\tractor_service.py": {
+    "classes": [
+      {
+        "name": "TractorService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_tractor",
+          "get_tractor_by_id",
+          "get_all_tractors",
+          "update_tractor",
+          "delete_tractor",
+          "paginate_tractors"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.exceptions.tractor",
+      "app.application.dtos.tractor",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.repositories.tractor_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\trip_expense_service.py": {
+    "classes": [
+      {
+        "name": "TripExpenseService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "_validate_trip_state",
+          "create_expense",
+          "update_expense",
+          "delete_expense",
+          "get_expense_by_id",
+          "get_trip_expenses",
+          "get_trip_expense_summary",
+          "get_trip_profit_details",
+          "get_trip_dashboard"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.payment_mode",
+      "datetime",
+      "app.domain.exceptions.trip_expense",
+      "app.domain.enums.payment_status",
+      "decimal",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.exceptions.trip",
+      "app.domain.enums.expense_type",
+      "app.domain.enums.trip_status",
+      "app.domain.entities.trip_expense",
+      "app.domain.repositories.trip_expense_repository",
+      "app.application.dtos.trip_expense",
+      "app.domain.repositories.trip_repository",
+      "app.application.services.expense_number_generator",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\services\\trip_number_generator.py": {
+    "classes": [
+      {
+        "name": "TripNumberGenerator",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "generate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.trip_repository",
+      "datetime"
+    ]
+  },
+  "application\\services\\trip_service.py": {
+    "classes": [
+      {
+        "name": "TripService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create_trip",
+          "get_trip_by_id",
+          "update_trip",
+          "update_trip_status",
+          "delete_trip",
+          "get_trip_history",
+          "paginate_trips"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.party",
+      "app.domain.entities.party",
+      "app.domain.exceptions.tractor",
+      "app.domain.exceptions.trip",
+      "app.domain.enums.trip_status",
+      "app.domain.exceptions.driver",
+      "app.domain.repositories.trip_repository",
+      "app.domain.entities.tractor",
+      "app.domain.enums.driver_status",
+      "app.application.services.trip_number_generator",
+      "uuid",
+      "typing",
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.trip_status_history",
+      "app.application.dtos.trip",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip"
+    ]
+  },
+  "application\\services\\user_service.py": {
+    "classes": [
+      {
+        "name": "UserService",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "get_user_by_id",
+          "create_user",
+          "update_user",
+          "lock_user",
+          "unlock_user",
+          "delete_user",
+          "list_users",
+          "get_dashboard_stats",
+          "verify_user_permission",
+          "verify_user_role"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.application.services.permission_cache_service",
+      "app.domain.entities.user",
+      "app.domain.exceptions.base",
+      "app.application.dtos.users",
+      "app.domain.repositories.user_repository",
+      "app.domain.enums.user_status",
+      "app.domain.repositories.role_repository",
+      "app.core.security",
+      "uuid",
+      "typing"
+    ]
+  },
+  "application\\validators\\auth_validator.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "validate_auth_token_payload"
+      }
+    ],
+    "imports": [
+      "app.domain.exceptions.auth",
+      "typing"
+    ]
+  },
+  "application\\validators\\password_validator.py": {
+    "classes": [
+      {
+        "name": "PasswordValidationError",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [
+      {
+        "name": "validate_password_complexity"
+      }
+    ],
+    "imports": [
+      "re",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "application\\validators\\user_validator.py": {
+    "classes": [
+      {
+        "name": "UserValidationError",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [
+      {
+        "name": "validate_username"
+      }
+    ],
+    "imports": [
+      "re",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "core\\security.py": {
+    "classes": [
+      {
+        "name": "SecuritySettings",
+        "bases": [],
+        "methods": [
+          "get_password_hash",
+          "verify_password"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "hash_password"
+      },
+      {
+        "name": "create_access_token"
+      },
+      {
+        "name": "create_refresh_token"
+      },
+      {
+        "name": "decode_token"
+      }
+    ],
+    "imports": [
+      "datetime",
+      "pwdlib.hashers.argon2",
+      "os",
+      "pwdlib",
+      "jose",
+      "typing"
+    ]
+  },
+  "core\\settings.py": {
+    "classes": [
+      {
+        "name": "Settings",
+        "bases": [
+          "BaseSettings"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic_settings",
+      "pydantic",
+      "sys"
+    ]
+  },
+  "domain\\entities\\audit_log.py": {
+    "classes": [
+      {
+        "name": "AuditLog",
+        "bases": [
+          "Base"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.permission_module",
+      "sqlalchemy.sql",
+      "app.infrastructure.database.base",
+      "app.domain.enums.audit_action",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\driver.py": {
+    "classes": [
+      {
+        "name": "Driver",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.driver_status",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\expense.py": {
+    "classes": [
+      {
+        "name": "Expense",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.entities.expense_category",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\expense_category.py": {
+    "classes": [
+      {
+        "name": "ExpenseCategory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.database.base",
+      "sqlalchemy.orm",
+      "sqlalchemy"
+    ]
+  },
+  "domain\\entities\\fuel_history.py": {
+    "classes": [
+      {
+        "name": "FuelHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.fuel_transaction_status",
+      "app.infrastructure.database.base",
+      "app.domain.entities.fuel_transaction",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\fuel_transaction.py": {
+    "classes": [
+      {
+        "name": "FuelTransaction",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.fuel_type",
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "app.domain.entities.tractor",
+      "app.domain.entities.driver",
+      "app.domain.enums.fuel_payment_mode",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.domain.enums.fuel_transaction_status",
+      "app.domain.entities.fuel_vendor",
+      "app.domain.entities.fuel_history",
+      "app.domain.enums.fuel_station_type",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\fuel_vendor.py": {
+    "classes": [
+      {
+        "name": "FuelVendor",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "app.domain.entities.fuel_transaction",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\invoice.py": {
+    "classes": [
+      {
+        "name": "Invoice",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.invoice_status",
+      "app.domain.entities.party",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.domain.entities.invoice_payment_history",
+      "app.domain.entities.invoice_payment",
+      "app.infrastructure.database.base",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\invoice_payment.py": {
+    "classes": [
+      {
+        "name": "InvoicePayment",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.payment_status",
+      "sqlalchemy.orm",
+      "decimal",
+      "sqlalchemy",
+      "app.domain.enums.payment_source",
+      "app.infrastructure.database.base",
+      "uuid"
+    ]
+  },
+  "domain\\entities\\invoice_payment_history.py": {
+    "classes": [
+      {
+        "name": "InvoicePaymentHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.orm",
+      "decimal",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "uuid"
+    ]
+  },
+  "domain\\entities\\invoice_status_history.py": {
+    "classes": [
+      {
+        "name": "InvoiceStatusHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.user",
+      "app.domain.entities.invoice",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.sql",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\login_history.py": {
+    "classes": [
+      {
+        "name": "LoginHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.dialects.postgresql",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.login_result",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\maintenance.py": {
+    "classes": [
+      {
+        "name": "Maintenance",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "app.domain.entities.tractor",
+      "app.domain.entities.maintenance_history",
+      "app.domain.enums.maintenance_priority",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.maintenance_type",
+      "app.domain.enums.maintenance_status",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\maintenance_history.py": {
+    "classes": [
+      {
+        "name": "MaintenanceHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "decimal",
+      "sqlalchemy",
+      "app.domain.entities.maintenance",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\material.py": {
+    "classes": [
+      {
+        "name": "Material",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.database.base",
+      "sqlalchemy.orm",
+      "decimal",
+      "sqlalchemy"
+    ]
+  },
+  "domain\\entities\\notification.py": {
+    "classes": [
+      {
+        "name": "Notification",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": [
+          "is_read"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.notification_type",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\party.py": {
+    "classes": [
+      {
+        "name": "Party",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.invoice",
+      "sqlalchemy.orm",
+      "decimal",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "typing"
+    ]
+  },
+  "domain\\entities\\password_history.py": {
+    "classes": [
+      {
+        "name": "PasswordHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\payment.py": {
+    "classes": [
+      {
+        "name": "Payment",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.payment_mode",
+      "datetime",
+      "app.domain.entities.driver",
+      "app.domain.entities.party",
+      "app.domain.entities.expense_category",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.domain.enums.payment_type",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\permission.py": {
+    "classes": [
+      {
+        "name": "Permission",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "sqlalchemy.dialects.postgresql",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.permission_module",
+      "app.domain.entities.role",
+      "app.infrastructure.database.base",
+      "typing"
+    ]
+  },
+  "domain\\entities\\quarry.py": {
+    "classes": [
+      {
+        "name": "Quarry",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.database.base",
+      "sqlalchemy.orm",
+      "sqlalchemy"
+    ]
+  },
+  "domain\\entities\\refresh_token.py": {
+    "classes": [
+      {
+        "name": "RefreshToken",
+        "bases": [
+          "Base"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.sql",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\role.py": {
+    "classes": [
+      {
+        "name": "Role",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "app.domain.entities.permission",
+      "typing"
+    ]
+  },
+  "domain\\entities\\role_permission.py": {
+    "classes": [
+      {
+        "name": "RolePermission",
+        "bases": [
+          "Base"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.sql",
+      "app.infrastructure.database.base",
+      "uuid"
+    ]
+  },
+  "domain\\entities\\settings.py": {
+    "classes": [
+      {
+        "name": "Settings",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.database.base",
+      "sqlalchemy.orm",
+      "sqlalchemy"
+    ]
+  },
+  "domain\\entities\\tractor.py": {
+    "classes": [
+      {
+        "name": "Tractor",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "app.domain.enums.tractor_status",
+      "uuid"
+    ]
+  },
+  "domain\\entities\\trip.py": {
+    "classes": [
+      {
+        "name": "Trip",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.trip_status_history",
+      "app.domain.entities.tractor",
+      "app.domain.entities.party",
+      "app.domain.entities.invoice",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.trip_status",
+      "app.domain.entities.trip_expense",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\trip_expense.py": {
+    "classes": [
+      {
+        "name": "TripExpense",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.payment_mode",
+      "datetime",
+      "app.domain.entities.party",
+      "app.domain.enums.payment_status",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.domain.enums.expense_type",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\trip_status_history.py": {
+    "classes": [
+      {
+        "name": "TripStatusHistory",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\user.py": {
+    "classes": [
+      {
+        "name": "User",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "app.domain.entities.refresh_token",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.enums.user_status",
+      "app.domain.entities.user_session",
+      "app.domain.entities.password_history",
+      "app.domain.entities.role",
+      "app.infrastructure.database.base",
+      "app.domain.entities.user_preference",
+      "app.domain.entities.login_history",
+      "typing"
+    ]
+  },
+  "domain\\entities\\user_preference.py": {
+    "classes": [
+      {
+        "name": "UserPreference",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\entities\\user_role.py": {
+    "classes": [
+      {
+        "name": "UserRole",
+        "bases": [
+          "Base"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.sql",
+      "app.infrastructure.database.base",
+      "uuid"
+    ]
+  },
+  "domain\\entities\\user_session.py": {
+    "classes": [
+      {
+        "name": "UserSession",
+        "bases": [
+          "BaseEntity"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.dialects.postgresql",
+      "app.domain.enums.session_status",
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\enums\\audit_action.py": {
+    "classes": [
+      {
+        "name": "AuditAction",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\driver_status.py": {
+    "classes": [
+      {
+        "name": "DriverStatus",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\expense_category.py": {
+    "classes": [
+      {
+        "name": "ExpenseCategory",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\expense_type.py": {
+    "classes": [
+      {
+        "name": "ExpenseType",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\fuel_payment_mode.py": {
+    "classes": [
+      {
+        "name": "FuelPaymentMode",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\fuel_station_type.py": {
+    "classes": [
+      {
+        "name": "FuelStationType",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\fuel_transaction_status.py": {
+    "classes": [
+      {
+        "name": "FuelTransactionStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\fuel_type.py": {
+    "classes": [
+      {
+        "name": "FuelType",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\invoice_status.py": {
+    "classes": [
+      {
+        "name": "InvoiceStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\login_result.py": {
+    "classes": [
+      {
+        "name": "LoginResult",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\maintenance_priority.py": {
+    "classes": [
+      {
+        "name": "MaintenancePriority",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\maintenance_status.py": {
+    "classes": [
+      {
+        "name": "MaintenanceStatus",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\maintenance_type.py": {
+    "classes": [
+      {
+        "name": "MaintenanceType",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\notification_type.py": {
+    "classes": [
+      {
+        "name": "NotificationType",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\payment_mode.py": {
+    "classes": [
+      {
+        "name": "PaymentMode",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\payment_source.py": {
+    "classes": [
+      {
+        "name": "PaymentSource",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\payment_status.py": {
+    "classes": [
+      {
+        "name": "PaymentStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\payment_type.py": {
+    "classes": [
+      {
+        "name": "PaymentType",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\permission_module.py": {
+    "classes": [
+      {
+        "name": "PermissionModule",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\role_type.py": {
+    "classes": [
+      {
+        "name": "RoleType",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\session_status.py": {
+    "classes": [
+      {
+        "name": "SessionStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\token_type.py": {
+    "classes": [
+      {
+        "name": "TokenType",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\tractor_status.py": {
+    "classes": [
+      {
+        "name": "TractorStatus",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\trip_status.py": {
+    "classes": [
+      {
+        "name": "TripStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\user_role.py": {
+    "classes": [
+      {
+        "name": "UserRole",
+        "bases": [
+          "StrEnum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\enums\\user_status.py": {
+    "classes": [
+      {
+        "name": "UserStatus",
+        "bases": [
+          "str",
+          "Enum"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "enum"
+    ]
+  },
+  "domain\\exceptions\\auth.py": {
+    "classes": [
+      {
+        "name": "AuthenticationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "AuthorizationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "UserAlreadyExistsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvalidCredentialsException",
+        "bases": [
+          "AuthenticationException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "RoleNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "PermissionDeniedException",
+        "bases": [
+          "AuthorizationException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TokenExpiredException",
+        "bases": [
+          "AuthenticationException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\base.py": {
+    "classes": [
+      {
+        "name": "DomainException",
+        "bases": [
+          "Exception"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "ResourceNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      },
+      {
+        "name": "ValidationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      },
+      {
+        "name": "UnauthorizedException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": []
+  },
+  "domain\\exceptions\\driver.py": {
+    "classes": [
+      {
+        "name": "DriverNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "DriverAlreadyExistsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "DriverHasActiveTripsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\fuel.py": {
+    "classes": [
+      {
+        "name": "FuelTransactionNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelValidationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelCapacityExceededException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelMileageException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelOdometerException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelVendorNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "FuelDuplicateException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\invoice.py": {
+    "classes": [
+      {
+        "name": "InvoiceException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": []
+      },
+      {
+        "name": "InvoiceNotFoundException",
+        "bases": [
+          "InvoiceException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceAlreadyExistsException",
+        "bases": [
+          "InvoiceException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceStatusException",
+        "bases": [
+          "InvoiceException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoicePaymentException",
+        "bases": [
+          "InvoiceException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceGenerationException",
+        "bases": [
+          "InvoiceException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\invoice_payment.py": {
+    "classes": [
+      {
+        "name": "InvoicePaymentNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoicePaymentExceededException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceDraftException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceCancelledException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoiceAlreadyPaidException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvoicePaymentValidationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "ReceiptNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\maintenance.py": {
+    "classes": [
+      {
+        "name": "MaintenanceNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "MaintenanceAlreadyScheduledException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "MaintenanceStatusException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "MaintenanceValidationException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "MaintenanceDeleteException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\party.py": {
+    "classes": [
+      {
+        "name": "PartyNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "PartyAlreadyExistsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "PartyHasActiveTripsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\tractor.py": {
+    "classes": [
+      {
+        "name": "TractorNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TractorAlreadyExistsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TractorHasActiveTripsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\trip.py": {
+    "classes": [
+      {
+        "name": "TripNotFoundException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripAlreadyExistsException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripStatusException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "DriverBusyException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TractorBusyException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripDeleteException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InactiveDriverException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InactiveTractorException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InactivePartyException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "InvalidTripDateException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "AdvanceAmountException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripAlreadyCompletedException",
+        "bases": [
+          "DomainException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "app.domain.exceptions.base"
+    ]
+  },
+  "domain\\exceptions\\trip_expense.py": {
+    "classes": [
+      {
+        "name": "TripExpenseException",
+        "bases": [
+          "Exception"
+        ],
+        "methods": []
+      },
+      {
+        "name": "TripExpenseNotFoundException",
+        "bases": [
+          "TripExpenseException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripCompletedException",
+        "bases": [
+          "TripExpenseException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripCancelledException",
+        "bases": [
+          "TripExpenseException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "TripExpenseValidationException",
+        "bases": [
+          "TripExpenseException"
+        ],
+        "methods": [
+          "__init__"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid"
+    ]
+  },
+  "domain\\repositories\\audit_repository.py": {
+    "classes": [
+      {
+        "name": "AuditRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "create",
+          "list_audit_logs"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.audit_log",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\base_repository.py": {
+    "classes": [
+      {
+        "name": "BaseRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "create",
+          "get_by_id",
+          "get_all",
+          "update",
+          "delete",
+          "exists",
+          "count",
+          "paginate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.database.base",
+      "abc",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\dashboard_repository.py": {
+    "classes": [
+      {
+        "name": "DashboardRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_kpis",
+          "get_revenue_chart"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\driver_repository.py": {
+    "classes": [
+      {
+        "name": "DriverRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_employee_code",
+          "get_by_license_number",
+          "get_by_contact_phone",
+          "has_active_trips",
+          "get_drivers"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "typing",
+      "abc",
+      "uuid",
+      "app.domain.repositories.base_repository"
+    ]
+  },
+  "domain\\repositories\\financial_report_repository.py": {
+    "classes": [
+      {
+        "name": "FinancialReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_expense_breakdown",
+          "get_monthly_profit",
+          "get_receivables",
+          "get_collections"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\fleet_report_repository.py": {
+    "classes": [
+      {
+        "name": "FleetReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_fleet_utilization",
+          "get_driver_performance",
+          "get_tractor_profitability"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\fuel_report_repository.py": {
+    "classes": [
+      {
+        "name": "FuelReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_fuel_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\fuel_repository.py": {
+    "classes": [
+      {
+        "name": "FuelRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "create",
+          "get_by_id",
+          "get_all",
+          "count",
+          "update",
+          "check_duplicate",
+          "get_previous_transaction",
+          "get_latest_odometer",
+          "add_history"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "abc",
+      "app.domain.entities.fuel_history",
+      "app.domain.entities.fuel_transaction",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\fuel_vendor_repository.py": {
+    "classes": [
+      {
+        "name": "FuelVendorRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "create",
+          "get_by_id",
+          "get_all",
+          "count",
+          "update",
+          "soft_delete",
+          "check_duplicate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.application.dtos.fuel_vendor",
+      "abc",
+      "app.domain.entities.fuel_vendor",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\invoice_payment_repository.py": {
+    "classes": [
+      {
+        "name": "InvoicePaymentRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_receipt_number",
+          "get_invoice_payments",
+          "get_dashboard_metrics",
+          "get_payment_source_breakdown"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "typing",
+      "abc",
+      "app.domain.entities.invoice_payment",
+      "uuid",
+      "app.domain.repositories.base_repository"
+    ]
+  },
+  "domain\\repositories\\invoice_repository.py": {
+    "classes": [
+      {
+        "name": "InvoiceRepository",
+        "bases": [],
+        "methods": [
+          "get_by_invoice_number",
+          "get_by_trip",
+          "get_max_sequence_for_year",
+          "get_invoice_status_history",
+          "get_invoice_dashboard_summary",
+          "get_overdue_invoices",
+          "get_pending_invoices",
+          "get_paid_invoices",
+          "get_invoices"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.base_repository",
+      "app.domain.enums.invoice_status",
+      "app.domain.entities.invoice",
+      "abc",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\login_history_repository.py": {
+    "classes": [
+      {
+        "name": "LoginHistoryRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "create",
+          "list_by_user",
+          "get_today_login_count",
+          "get_today_failed_login_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.login_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\maintenance_report_repository.py": {
+    "classes": [
+      {
+        "name": "MaintenanceReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_maintenance_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\maintenance_repository.py": {
+    "classes": [
+      {
+        "name": "MaintenanceRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_id",
+          "get_by_number",
+          "get_active_for_tractor",
+          "search",
+          "get_dashboard_stats",
+          "get_upcoming_services",
+          "get_overdue_services",
+          "get_history",
+          "save"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.maintenance_history",
+      "abc",
+      "app.domain.entities.maintenance",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\party_report_repository.py": {
+    "classes": [
+      {
+        "name": "PartyReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_party_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\party_repository.py": {
+    "classes": [
+      {
+        "name": "PartyRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_mobile",
+          "get_by_gst",
+          "get_by_pan",
+          "has_active_trips",
+          "get_parties"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.party",
+      "typing",
+      "abc",
+      "uuid",
+      "app.domain.repositories.base_repository"
+    ]
+  },
+  "domain\\repositories\\password_history_repository.py": {
+    "classes": [
+      {
+        "name": "PasswordHistoryRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "create",
+          "list_by_user"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.password_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\permission_repository.py": {
+    "classes": [
+      {
+        "name": "PermissionRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "list_all",
+          "get_by_ids"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.permission",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\refresh_token_repository.py": {
+    "classes": [
+      {
+        "name": "RefreshTokenRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "create",
+          "get_by_token",
+          "update",
+          "revoke_all_for_user"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.refresh_token",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\role_repository.py": {
+    "classes": [
+      {
+        "name": "RoleRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "get_by_id",
+          "get_by_name",
+          "list_roles",
+          "create",
+          "update",
+          "delete"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.role",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\session_repository.py": {
+    "classes": [
+      {
+        "name": "SessionRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "create",
+          "get_by_id",
+          "get_by_refresh_jti",
+          "list_by_user",
+          "update",
+          "delete",
+          "revoke_all_for_user",
+          "get_active_sessions_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user_session",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\tractor_repository.py": {
+    "classes": [
+      {
+        "name": "TractorRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_tractor_number",
+          "get_by_rc_number",
+          "has_active_trips",
+          "get_tractors"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.tractor",
+      "typing",
+      "abc",
+      "uuid",
+      "app.domain.repositories.base_repository"
+    ]
+  },
+  "domain\\repositories\\trip_expense_repository.py": {
+    "classes": [
+      {
+        "name": "TripExpenseRepository",
+        "bases": [],
+        "methods": [
+          "get_trip_expenses",
+          "get_monthly_expenses",
+          "get_expenses_by_type",
+          "get_expenses_by_trip",
+          "get_top_expense_category",
+          "get_trip_profit",
+          "get_driver_expense",
+          "get_tractor_expense",
+          "get_dashboard_summary",
+          "get_max_sequence_for_year",
+          "get_trip_status_history"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.enums.payment_mode",
+      "datetime",
+      "app.domain.repositories.base_repository",
+      "decimal",
+      "abc",
+      "app.domain.enums.expense_type",
+      "app.domain.entities.trip_expense",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\trip_report_repository.py": {
+    "classes": [
+      {
+        "name": "TripReportRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_trip_statistics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "datetime",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\trip_repository.py": {
+    "classes": [
+      {
+        "name": "TripRepository",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "get_by_trip_number",
+          "get_active_trip_by_driver",
+          "get_active_trip_by_tractor",
+          "get_max_sequence_for_year",
+          "get_trips",
+          "count_active_trips",
+          "count_completed_today",
+          "count_pending",
+          "count_in_progress",
+          "get_trips_count_by_date_range",
+          "get_revenue_by_date_range",
+          "has_expenses",
+          "has_invoice",
+          "has_settlement"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.base_repository",
+      "app.domain.entities.trip",
+      "abc",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\user_preference_repository.py": {
+    "classes": [
+      {
+        "name": "UserPreferenceRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "get_by_user",
+          "create_or_update"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user_preference",
+      "uuid",
+      "typing"
+    ]
+  },
+  "domain\\repositories\\user_repository.py": {
+    "classes": [
+      {
+        "name": "UserRepository",
+        "bases": [
+          "Protocol"
+        ],
+        "methods": [
+          "get_by_id",
+          "get_by_email",
+          "get_by_username",
+          "list_users",
+          "create",
+          "update",
+          "delete",
+          "restore",
+          "bulk_update_status",
+          "get_total_count",
+          "get_active_count",
+          "get_locked_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "app.domain.enums.user_status",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\database\\base.py": {
+    "classes": [
+      {
+        "name": "Base",
+        "bases": [
+          "DeclarativeBase"
+        ],
+        "methods": []
+      },
+      {
+        "name": "BaseEntity",
+        "bases": [
+          "Base"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.party",
+      "app.domain.entities.invoice",
+      "app.domain.entities.audit_log",
+      "app.domain.entities.fuel_vendor",
+      "app.domain.entities.user_role",
+      "app.domain.entities.password_history",
+      "app.domain.entities.invoice_payment",
+      "app.domain.entities.login_history",
+      "app.domain.entities.role_permission",
+      "app.domain.entities.maintenance_history",
+      "sqlalchemy.orm",
+      "app.domain.entities.material",
+      "app.domain.entities.invoice_payment_history",
+      "app.domain.entities.maintenance",
+      "app.domain.entities.trip_expense",
+      "app.domain.entities.role",
+      "app.domain.entities.user_preference",
+      "app.domain.entities.tractor",
+      "app.domain.entities.refresh_token",
+      "app.domain.entities.expense_category",
+      "app.domain.entities.notification",
+      "app.domain.entities.quarry",
+      "app.domain.entities.expense",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "app.domain.entities.payment",
+      "typing",
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.user",
+      "app.domain.entities.trip_status_history",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "sqlalchemy.sql",
+      "app.domain.entities.fuel_history",
+      "app.domain.entities.user_session",
+      "app.domain.entities.permission",
+      "app.domain.entities.fuel_transaction",
+      "app.domain.entities.settings"
+    ]
+  },
+  "infrastructure\\database\\session.py": {
+    "classes": [],
+    "functions": [],
+    "imports": [
+      "app.core.settings",
+      "sqlalchemy.ext.asyncio"
+    ]
+  },
+  "infrastructure\\repositories\\audit_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyAuditRepository",
+        "bases": [
+          "AuditRepository"
+        ],
+        "methods": [
+          "__init__",
+          "create",
+          "list_audit_logs"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.audit_log",
+      "sqlalchemy",
+      "app.domain.repositories.audit_repository",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\base_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyBaseRepository",
+        "bases": [],
+        "methods": [
+          "__init__",
+          "create",
+          "get_by_id",
+          "get_all",
+          "update",
+          "delete",
+          "exists",
+          "count",
+          "paginate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.base_repository",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.database.base",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\dashboard_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyDashboardRepository",
+        "bases": [
+          "DashboardRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_kpis",
+          "get_revenue_chart"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.entities.invoice",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.entities.invoice_payment",
+      "app.domain.entities.trip_expense",
+      "app.domain.repositories.dashboard_repository",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\driver_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyDriverRepository",
+        "bases": [
+          "DriverRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_employee_code",
+          "get_by_license_number",
+          "get_by_contact_phone",
+          "has_active_trips",
+          "get_drivers"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.repositories.driver_repository",
+      "app.infrastructure.repositories.base_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\financial_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyFinancialReportRepository",
+        "bases": [
+          "FinancialReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_expense_breakdown",
+          "get_monthly_profit",
+          "get_receivables",
+          "get_collections"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.invoice",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.repositories.financial_report_repository",
+      "app.domain.entities.trip_expense",
+      "app.domain.entities.invoice_payment",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\fleet_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyFleetReportRepository",
+        "bases": [
+          "FleetReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_fleet_utilization",
+          "get_driver_performance",
+          "get_tractor_profitability"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.entities.invoice",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.repositories.fleet_report_repository",
+      "app.domain.entities.fuel_transaction",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\fuel_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyFuelReportRepository",
+        "bases": [
+          "FuelReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_fuel_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.repositories.fuel_report_repository",
+      "app.domain.entities.tractor",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.fuel_transaction",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\fuel_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyFuelRepository",
+        "bases": [
+          "FuelRepository"
+        ],
+        "methods": [
+          "__init__",
+          "create",
+          "get_by_id",
+          "get_all",
+          "count",
+          "update",
+          "check_duplicate",
+          "get_previous_transaction",
+          "get_latest_odometer",
+          "add_history"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.tractor",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.fuel_history",
+      "app.domain.entities.fuel_transaction",
+      "app.domain.repositories.fuel_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\fuel_vendor_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyFuelVendorRepository",
+        "bases": [
+          "FuelVendorRepository"
+        ],
+        "methods": [
+          "__init__",
+          "create",
+          "get_by_id",
+          "get_all",
+          "count",
+          "update",
+          "soft_delete",
+          "check_duplicate"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.repositories.fuel_vendor_repository",
+      "app.domain.entities.fuel_vendor",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\invoice_payment_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyInvoicePaymentRepository",
+        "bases": [
+          "InvoicePaymentRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_receipt_number",
+          "get_invoice_payments",
+          "get_dashboard_metrics",
+          "get_payment_source_breakdown"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.party",
+      "app.domain.entities.invoice",
+      "app.domain.repositories.invoice_payment_repository",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.entities.trip",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.invoice_payment",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\invoice_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyInvoiceRepository",
+        "bases": [
+          "InvoiceRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_id",
+          "get_by_invoice_number",
+          "get_by_trip",
+          "get_max_sequence_for_year",
+          "get_invoice_status_history",
+          "get_invoice_dashboard_summary",
+          "get_overdue_invoices",
+          "get_pending_invoices",
+          "get_paid_invoices",
+          "get_invoices"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.enums.invoice_status",
+      "app.domain.entities.tractor",
+      "app.domain.entities.party",
+      "app.domain.entities.invoice",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.repositories.invoice_repository",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.invoice_status_history",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\login_history_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyLoginHistoryRepository",
+        "bases": [
+          "LoginHistoryRepository"
+        ],
+        "methods": [
+          "__init__",
+          "list_by_user",
+          "get_today_login_count",
+          "get_today_failed_login_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.domain.enums.login_result",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.repositories.login_history_repository",
+      "app.domain.entities.login_history",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\maintenance_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyMaintenanceReportRepository",
+        "bases": [
+          "MaintenanceReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_maintenance_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.repositories.maintenance_report_repository",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.maintenance",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\maintenance_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyMaintenanceRepository",
+        "bases": [
+          "MaintenanceRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_id",
+          "get_by_number",
+          "get_active_for_tractor",
+          "search",
+          "get_dashboard_stats",
+          "get_upcoming_services",
+          "get_overdue_services",
+          "get_history",
+          "save"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.maintenance_history",
+      "app.domain.entities.tractor",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "app.domain.repositories.maintenance_repository",
+      "app.domain.entities.maintenance",
+      "app.domain.enums.maintenance_status",
+      "app.infrastructure.repositories.base_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\party_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyPartyReportRepository",
+        "bases": [
+          "PartyReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_party_analytics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.party",
+      "app.domain.entities.invoice",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.repositories.party_report_repository",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\party_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyPartyRepository",
+        "bases": [
+          "PartyRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_mobile",
+          "get_by_gst",
+          "get_by_pan",
+          "has_active_trips",
+          "get_parties"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.party",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.infrastructure.repositories.base_repository",
+      "uuid",
+      "app.domain.repositories.party_repository",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\password_history_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyPasswordHistoryRepository",
+        "bases": [
+          "PasswordHistoryRepository"
+        ],
+        "methods": [
+          "__init__",
+          "list_by_user"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.password_history_repository",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.domain.entities.password_history",
+      "app.infrastructure.repositories.base_repository",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\permission_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyPermissionRepository",
+        "bases": [
+          "PermissionRepository"
+        ],
+        "methods": [
+          "__init__",
+          "list_all",
+          "get_by_ids"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.repositories.permission_repository",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.permission",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\refresh_token_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyRefreshTokenRepository",
+        "bases": [
+          "RefreshTokenRepository"
+        ],
+        "methods": [
+          "__init__",
+          "create",
+          "get_by_token",
+          "update",
+          "revoke_all_for_user"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.refresh_token",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "uuid",
+      "app.domain.repositories.refresh_token_repository"
+    ]
+  },
+  "infrastructure\\repositories\\role_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyRoleRepository",
+        "bases": [
+          "RoleRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_name",
+          "get_by_id",
+          "list_roles"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "sqlalchemy.orm",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.domain.repositories.role_repository",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.role"
+    ]
+  },
+  "infrastructure\\repositories\\session_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemySessionRepository",
+        "bases": [
+          "SessionRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_refresh_jti",
+          "list_by_user",
+          "revoke_all_for_user",
+          "get_active_sessions_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.enums.session_status",
+      "app.domain.repositories.session_repository",
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.domain.entities.user_session",
+      "app.infrastructure.repositories.base_repository",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\tractor_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyTractorRepository",
+        "bases": [
+          "TractorRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_tractor_number",
+          "get_by_rc_number",
+          "has_active_trips",
+          "get_tractors"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.domain.entities.tractor",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.repositories.tractor_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\trip_expense_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyTripExpenseRepository",
+        "bases": [
+          "TripExpenseRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_id",
+          "get_trip_expenses",
+          "get_monthly_expenses",
+          "get_expenses_by_type",
+          "get_expenses_by_trip",
+          "get_top_expense_category",
+          "get_trip_profit",
+          "get_driver_expense",
+          "get_tractor_expense",
+          "get_dashboard_summary",
+          "get_max_sequence_for_year",
+          "get_trip_status_history"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.enums.payment_mode",
+      "app.domain.entities.tractor",
+      "app.domain.entities.trip_status_history",
+      "decimal",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.enums.expense_type",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.trip_expense",
+      "app.domain.repositories.trip_expense_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\trip_report_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyTripReportRepository",
+        "bases": [
+          "TripReportRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_trip_statistics"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.repositories.trip_report_repository",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\trip_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyTripRepository",
+        "bases": [
+          "TripRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_id",
+          "get_by_trip_number",
+          "get_active_trip_by_driver",
+          "get_active_trip_by_tractor",
+          "get_max_sequence_for_year",
+          "get_trips",
+          "count_active_trips",
+          "count_completed_today",
+          "count_pending",
+          "count_in_progress",
+          "get_trips_count_by_date_range",
+          "get_revenue_by_date_range",
+          "has_expenses",
+          "has_invoice",
+          "has_settlement"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.driver",
+      "datetime",
+      "app.domain.entities.tractor",
+      "app.domain.entities.party",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.entities.trip",
+      "app.domain.enums.trip_status",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.repositories.trip_repository",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\repositories\\user_preference_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyUserPreferenceRepository",
+        "bases": [
+          "UserPreferenceRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_user",
+          "create_or_update"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "sqlalchemy.ext.asyncio",
+      "sqlalchemy",
+      "app.domain.repositories.user_preference_repository",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.user_preference",
+      "uuid"
+    ]
+  },
+  "infrastructure\\repositories\\user_repository.py": {
+    "classes": [
+      {
+        "name": "SQLAlchemyUserRepository",
+        "bases": [
+          "UserRepository"
+        ],
+        "methods": [
+          "__init__",
+          "get_by_email",
+          "get_by_username",
+          "get_with_roles_and_permissions",
+          "list_users",
+          "search_users",
+          "bulk_update_status",
+          "get_total_count",
+          "get_active_count",
+          "get_locked_count"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy.orm",
+      "sqlalchemy",
+      "sqlalchemy.ext.asyncio",
+      "app.domain.repositories.user_repository",
+      "app.domain.enums.user_status",
+      "app.infrastructure.repositories.base_repository",
+      "app.domain.entities.role",
+      "uuid",
+      "typing"
+    ]
+  },
+  "infrastructure\\seed\\base_seed.py": {
+    "classes": [
+      {
+        "name": "SeedContext",
+        "bases": [],
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "BaseSeed",
+        "bases": [
+          "ABC"
+        ],
+        "methods": [
+          "__init__",
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "abc",
+      "logging",
+      "app.core.settings",
+      "sqlalchemy.ext.asyncio"
+    ]
+  },
+  "infrastructure\\seed\\constants.py": {
+    "classes": [],
+    "functions": [],
+    "imports": [
+      "uuid"
+    ]
+  },
+  "infrastructure\\seed\\registry.py": {
+    "classes": [],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.seed.security.seed_user_roles",
+      "app.infrastructure.seed.system.seed_system",
+      "app.infrastructure.seed.security.seed_roles",
+      "app.infrastructure.seed.security.seed_role_permissions",
+      "app.infrastructure.seed.security.seed_admin",
+      "app.infrastructure.seed.security.seed_permissions"
+    ]
+  },
+  "infrastructure\\seed\\seed_runner.py": {
+    "classes": [],
+    "functions": [
+      {
+        "name": "run_seeds"
+      },
+      {
+        "name": "main"
+      }
+    ],
+    "imports": [
+      "logging",
+      "asyncio",
+      "sys",
+      "sqlalchemy.ext.asyncio",
+      "app.infrastructure.database.session",
+      "app.core.settings",
+      "app.infrastructure.seed.registry",
+      "app.infrastructure.seed.base_seed"
+    ]
+  },
+  "infrastructure\\seed\\security\\seed_admin.py": {
+    "classes": [
+      {
+        "name": "AdminSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.user_repository",
+      "app.core.security",
+      "app.infrastructure.seed.constants"
+    ]
+  },
+  "infrastructure\\seed\\security\\seed_permissions.py": {
+    "classes": [
+      {
+        "name": "PermissionSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.permission",
+      "app.infrastructure.seed.constants",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.permission_repository"
+    ]
+  },
+  "infrastructure\\seed\\security\\seed_roles.py": {
+    "classes": [
+      {
+        "name": "RoleSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.seed.constants",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.role_repository",
+      "app.domain.entities.role"
+    ]
+  },
+  "infrastructure\\seed\\security\\seed_role_permissions.py": {
+    "classes": [
+      {
+        "name": "RolePermissionSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.role_permission",
+      "app.infrastructure.repositories.role_repository",
+      "sqlalchemy",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.permission_repository",
+      "app.infrastructure.seed.constants"
+    ]
+  },
+  "infrastructure\\seed\\security\\seed_user_roles.py": {
+    "classes": [
+      {
+        "name": "UserRoleSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.infrastructure.repositories.role_repository",
+      "sqlalchemy",
+      "app.domain.entities.user_role",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.user_repository",
+      "app.infrastructure.seed.constants"
+    ]
+  },
+  "infrastructure\\seed\\system\\seed_system.py": {
+    "classes": [
+      {
+        "name": "SystemUserSeed",
+        "bases": [
+          "BaseSeed"
+        ],
+        "methods": [
+          "run"
+        ]
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.domain.entities.user",
+      "sqlalchemy",
+      "app.infrastructure.seed.base_seed",
+      "app.infrastructure.repositories.user_repository",
+      "app.core.security",
+      "app.infrastructure.seed.constants",
+      "uuid"
+    ]
+  },
+  "schemas\\response.py": {
+    "classes": [
+      {
+        "name": "APIResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "PaginatedData",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic",
+      "typing"
+    ]
+  },
+  "schemas\\auth\\change_password.py": {
+    "classes": [
+      {
+        "name": "ChangePassword",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\forgot_password.py": {
+    "classes": [
+      {
+        "name": "ForgotPassword",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\login_request.py": {
+    "classes": [
+      {
+        "name": "LoginRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\login_response.py": {
+    "classes": [
+      {
+        "name": "LoginResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\refresh_request.py": {
+    "classes": [
+      {
+        "name": "RefreshRequest",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\refresh_response.py": {
+    "classes": [
+      {
+        "name": "RefreshResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\auth\\reset_password.py": {
+    "classes": [
+      {
+        "name": "ResetPassword",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\permission_response.py": {
+    "classes": [
+      {
+        "name": "PermissionResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\role_response.py": {
+    "classes": [
+      {
+        "name": "RoleCreate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      },
+      {
+        "name": "RoleResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "uuid",
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\user_create.py": {
+    "classes": [
+      {
+        "name": "UserCreate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\user_list_response.py": {
+    "classes": [
+      {
+        "name": "UserListResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "app.schemas.user.user_response",
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\user_response.py": {
+    "classes": [
+      {
+        "name": "UserResponse",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "datetime",
+      "app.schemas.user.role_response",
+      "uuid",
+      "pydantic"
+    ]
+  },
+  "schemas\\user\\user_update.py": {
+    "classes": [
+      {
+        "name": "UserUpdate",
+        "bases": [
+          "BaseModel"
+        ],
+        "methods": []
+      }
+    ],
+    "functions": [],
+    "imports": [
+      "pydantic"
+    ]
+  }
+}

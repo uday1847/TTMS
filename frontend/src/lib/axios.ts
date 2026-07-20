@@ -2,6 +2,8 @@ import axios, { AxiosError } from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 import { env } from '@/config/env'
 import { useAuthStore } from '@/stores/auth-store'
+import { parseApiError } from '@/shared/utils/api-error'
+import { decodeJWT } from '@/utils/jwt.utils'
 
 export const api = axios.create({
   baseURL: env.VITE_API_BASE_URL,
@@ -46,8 +48,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
+
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                           originalRequest.url?.includes('/auth/refresh') || 
+                           originalRequest.url?.includes('/auth/forgot-password') || 
+                           originalRequest.url?.includes('/auth/reset-password')
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
@@ -72,14 +79,23 @@ api.interceptors.response.use(
           throw new Error('No refresh token available')
         }
 
-        // Placeholder token refresh logic
-        // production flow:
-        // const response = await axios.post(`${env.VITE_API_BASE_URL}/auth/refresh`, { refresh_token: refreshToken })
-        // const { access_token, refresh_token } = response.data
-        const newAccessToken = 'refreshed-access-token'
+        const response = await axios.post(`${env.VITE_API_BASE_URL}/auth/refresh`, { refresh_token: refreshToken })
+        const newAccessToken = response.data.access_token
+        const newRefreshToken = response.data.refresh_token // Assume new refresh token is issued
+
+        const store = useAuthStore.getState()
+        store.setTokens(
+          newAccessToken,
+          newRefreshToken || refreshToken,
+          response.data.expires_in || store.expiresIn || 3600
+        )
         
-        useAuthStore.getState().updateAccessToken(newAccessToken)
-        
+        // Re-hydrate ephemeral state from new token
+        const payload = decodeJWT(newAccessToken)
+        if (payload) {
+          store.hydrateFromJWT(payload)
+        }
+
         processQueue(null, newAccessToken)
         isRefreshing = false
 
@@ -90,21 +106,11 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as Error, null)
         isRefreshing = false
-        useAuthStore.getState().clearCredentials()
+        useAuthStore.getState().clearAuth()
         return Promise.reject(refreshError)
       }
     }
 
-    const apiError = {
-      message: (error.response?.data as { detail?: string | { msg?: string }[] })?.detail 
-        ? (typeof (error.response?.data as { detail: any }).detail === 'string' 
-            ? (error.response?.data as { detail: string }).detail 
-            : 'Validation error in request parameters')
-        : error.message || 'An unexpected error occurred',
-      status: error.response?.status,
-      raw: error,
-    }
-
-    return Promise.reject(apiError)
+    return Promise.reject(parseApiError(error))
   }
 )

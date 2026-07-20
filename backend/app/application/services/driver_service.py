@@ -25,7 +25,7 @@ class DriverService:
         self.session = session
         self.repository = repository
 
-    async def create_driver(self, dto: DriverCreate, current_user_id: uuid.UUID) -> Driver:
+    async def create_driver(self, *, dto: DriverCreate, current_user_id: uuid.UUID) -> Driver:
         """
         Creates a new driver record after validating business constraints.
         Raises DriverAlreadyExistsException if employee code, license, or phone is already in use.
@@ -85,7 +85,7 @@ class DriverService:
         """
         return await self.repository.get_all()
 
-    async def update_driver(self, driver_id: uuid.UUID, dto: DriverUpdate, current_user_id: uuid.UUID) -> Driver:
+    async def update_driver(self, *, driver_id: uuid.UUID, dto: DriverUpdate, current_user_id: uuid.UUID) -> Driver:
         """
         Updates an existing driver profile.
         Validates unique constraints on changed values.
@@ -150,7 +150,7 @@ class DriverService:
         await self.session.commit()
         return driver
 
-    async def delete_driver(self, driver_id: uuid.UUID, current_user_id: uuid.UUID) -> bool:
+    async def delete_driver(self, *, driver_id: uuid.UUID, current_user_id: uuid.UUID) -> bool:
         """
         Soft-deletes a driver.
         Raises DriverNotFoundException or DriverHasActiveTripsException.

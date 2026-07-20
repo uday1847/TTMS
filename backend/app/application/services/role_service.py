@@ -25,28 +25,75 @@ class RoleService:
     async def list_roles(self, skip: int = 0, limit: int = 100) -> tuple[Sequence[Role], int]:
         return await self.role_repository.list_roles(skip, limit)
 
-    async def create_role(self, dto: RoleCreate) -> Role:
-        role = Role(name=dto.name, description=dto.description)
+    async def get_all_roles(self) -> Sequence[Role]:
+        roles, _ = await self.role_repository.list_roles(0, 1000)
+        return roles
+
+    async def create_role(self, dto: RoleCreate, current_user_id: uuid.UUID | None = None) -> Role:
+        role = Role(name=dto.name, display_name=dto.display_name, description=dto.description)
         if dto.permission_ids:
             permissions = await self.permission_repository.get_by_ids(dto.permission_ids)
             role.permissions = permissions
+        if current_user_id:
+            role.created_by = current_user_id
         return await self.role_repository.create(role)
 
-    async def update_role(self, role_id: uuid.UUID, dto: RoleUpdate) -> Role:
+    async def update_role(self, role_id: uuid.UUID, dto: RoleUpdate, current_user_id: uuid.UUID | None = None) -> Role:
         role = await self.get_role_by_id(role_id)
         if dto.name is not None:
             role.name = dto.name
+        if dto.display_name is not None:
+            role.display_name = dto.display_name
         if dto.description is not None:
             role.description = dto.description
         if dto.permission_ids is not None:
             permissions = await self.permission_repository.get_by_ids(dto.permission_ids)
             role.permissions = permissions
         
+        if current_user_id:
+            role.updated_by = current_user_id
+            
         updated_role = await self.role_repository.update(role)
-        PermissionCacheService.invalidate_all_permissions() # Invalidate cache to reflect new role perms
+        PermissionCacheService.invalidate_all_permissions()
         return updated_role
 
-    async def delete_role(self, role_id: uuid.UUID, deleted_by: uuid.UUID | None = None) -> None:
+    async def delete_role(self, role_id: uuid.UUID, deleted_by: uuid.UUID | None = None) -> bool:
         role = await self.get_role_by_id(role_id)
-        await self.role_repository.delete(role, deleted_by=deleted_by)
+        if deleted_by:
+            role.deleted_by = deleted_by
+            await self.role_repository.update(role)
+        await self.role_repository.delete(role_id)
         PermissionCacheService.invalidate_all_permissions()
+        return True
+        
+    async def assign_permission_to_role(self, role_id: uuid.UUID, permission_code: str, current_user_id: uuid.UUID | None = None) -> Role:
+        role = await self.get_role_by_id(role_id)
+        permission = await self.permission_repository.get_by_code(permission_code)
+        if not permission:
+            raise ResourceNotFoundException(f"Permission '{permission_code}' not found")
+        
+        if not any(p.id == permission.id for p in role.permissions):
+            role.permissions.append(permission)
+            if current_user_id:
+                role.updated_by = current_user_id
+            updated_role = await self.role_repository.update(role)
+            PermissionCacheService.invalidate_all_permissions()
+            return updated_role
+        return role
+
+    async def remove_permission_from_role(self, role_id: uuid.UUID, permission_code: str, current_user_id: uuid.UUID | None = None) -> Role:
+        role = await self.get_role_by_id(role_id)
+        permission = await self.permission_repository.get_by_code(permission_code)
+        if not permission:
+            raise ResourceNotFoundException(f"Permission '{permission_code}' not found")
+            
+        initial_count = len(role.permissions)
+        role.permissions = [p for p in role.permissions if p.id != permission.id]
+        
+        if len(role.permissions) < initial_count:
+            if current_user_id:
+                role.updated_by = current_user_id
+            updated_role = await self.role_repository.update(role)
+            PermissionCacheService.invalidate_all_permissions()
+            return updated_role
+        return role
