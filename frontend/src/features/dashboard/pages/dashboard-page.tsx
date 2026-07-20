@@ -29,6 +29,14 @@ export default function DashboardPage() {
               Manage Users
             </Link>
           </PermissionGuard>
+          <PermissionGuard permission="drivers:read">
+            <Link
+              to="/drivers"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Manage Drivers
+            </Link>
+          </PermissionGuard>
         </div>
       </div>
     </div>

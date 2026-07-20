@@ -9,7 +9,10 @@ import { PERMISSIONS } from '@/constants/permissions'
 // Lazy loaded page components
 const LoginPage = lazy(() => import('@/features/auth/pages/login-page'))
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/dashboard-page'))
-const DriversPage = lazy(() => import('@/features/drivers/pages/drivers-page'))
+const DriversPage = lazy(() => import('@/features/drivers/pages/DriverListPage'))
+const DriverCreatePage = lazy(() => import('@/features/drivers/pages/DriverCreatePage'))
+const DriverDetailsPage = lazy(() => import('@/features/drivers/pages/DriverDetailsPage'))
+const DriverEditPage = lazy(() => import('@/features/drivers/pages/DriverEditPage'))
 const TractorsPage = lazy(() => import('@/features/tractors/pages/tractors-page'))
 const PartiesPage = lazy(() => import('@/features/parties/pages/parties-page'))
 const QuarriesPage = lazy(() => import('@/features/quarries/pages/quarries-page'))
@@ -75,14 +78,47 @@ export function AppRouter() {
                 </Suspense>
               }
             />
-            <Route
-              path="/drivers"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <DriversPage />
-                </Suspense>
-              }
-            />
+            {/* Drivers Routes */}
+            <Route path="/drivers">
+              <Route element={<ProtectedRoute permission="drivers:read" />}>
+                <Route
+                  index
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <DriversPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <DriverDetailsPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="drivers:create" />}>
+                <Route
+                  path="create"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <DriverCreatePage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="drivers:update" />}>
+                <Route
+                  path=":id/edit"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <DriverEditPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+            </Route>
             <Route
               path="/tractors"
               element={
