@@ -97,7 +97,7 @@ class AuthenticationService:
         
         access_token = JWTService.create_access_token(user.id, user.email, user.token_version, permissions, roles)
         jti = str(uuid.uuid4())
-        refresh_token = JWTService.create_refresh_token(user.id, jti)
+        refresh_token = JWTService.create_refresh_token(user.id, jti, user.token_version)
 
         await self.session_service.create_session(
             user_id=user.id,
@@ -141,3 +141,63 @@ class AuthenticationService:
         
         # Revoke all sessions since password changed
         await self.session_service.revoke_all_sessions(user.id)
+
+    async def refresh_token(self, dto: RefreshTokenRequest, ip_address: str | None = None, user_agent: str | None = None) -> LoginResponse:
+        from jose import ExpiredSignatureError, JWTError
+        try:
+            payload = JWTService.verify_token(dto.refresh_token, expected_type="refresh")
+        except ExpiredSignatureError:
+            raise UnauthorizedException("Refresh token expired")
+        except JWTError:
+            raise UnauthorizedException("Invalid refresh token")
+
+        user_id_str = payload.get("sub")
+        if not user_id_str:
+            raise UnauthorizedException("Invalid refresh token")
+        user_id = uuid.UUID(user_id_str)
+        token_version = payload.get("token_version")
+        jti = payload.get("jti")
+
+        user = await self.user_repository.get_by_id(user_id)
+        if not user:
+            raise UnauthorizedException("User not found")
+        if user.status == UserStatus.INACTIVE:
+            raise UnauthorizedException("Account is inactive")
+        if user.status == UserStatus.LOCKED:
+            raise UnauthorizedException("Account is locked")
+        if user.token_version != token_version:
+            raise UnauthorizedException("Your permissions or account security settings have changed. Please log in again.")
+            
+        session = await self.session_service.get_by_jti(jti)
+        if not session or str(session.status.value) != "ACTIVE":
+             raise UnauthorizedException("Session revoked")
+             
+        user_with_perms = await self.user_repository.get_with_roles_and_permissions(user.id)
+        permissions = []
+        roles = []
+        if user_with_perms:
+            for role in user_with_perms.roles:
+                roles.append(role.name)
+                for perm in role.permissions:
+                    permissions.append(perm.name)
+                    
+        access_token = JWTService.create_access_token(user.id, user.email, user.token_version, permissions, roles)
+        
+        await self.session_service.revoke_session(session.id)
+        new_jti = str(uuid.uuid4())
+        new_refresh_token = JWTService.create_refresh_token(user.id, new_jti, user.token_version)
+        
+        await self.session_service.create_session(
+            user_id=user.id,
+            jti=new_jti,
+            device_fingerprint=dto.device_fingerprint,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+
+        return LoginResponse(
+            access_token=access_token,
+            refresh_token=new_refresh_token,
+            expires_in=security_settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            user_id=user.id
+        )

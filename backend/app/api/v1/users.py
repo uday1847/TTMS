@@ -1,7 +1,7 @@
 from typing import Annotated
 import uuid
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Request
 from fastapi.responses import JSONResponse
 
 from app.api.dependencies.auth import get_current_active_user, get_user_service
@@ -9,6 +9,7 @@ from app.api.dependencies.permissions import PermissionChecker
 from app.domain.entities.user import User
 from app.application.services.user_service import UserService
 from app.schemas.response import APIResponse, PaginatedData
+from app.application.dtos.audit import AuditContext
 from app.application.dtos.users import (
     UserCreate,
     UserResponse,
@@ -111,6 +112,7 @@ async def create_user(
     summary="Update user details",
 )
 async def update_user(
+    request: Request,
     id: uuid.UUID,
     dto: UserUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -119,7 +121,8 @@ async def update_user(
     """
     Updates profile values of a user.
     """
-    user = await user_service.update_user(user_id=id, dto=dto, current_user_id=current_user.id)
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
+    user = await user_service.update_user(user_id=id, dto=dto, audit_context=audit_context)
     response_dto = await user_service.get_user_with_access_profile(id)
 
     return APIResponse(
@@ -137,6 +140,7 @@ async def update_user(
     summary="Partially update user details",
 )
 async def patch_user(
+    request: Request,
     id: uuid.UUID,
     dto: UserUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -145,7 +149,8 @@ async def patch_user(
     """
     Performs partial updates on user details.
     """
-    user = await user_service.update_user(user_id=id, dto=dto, current_user_id=current_user.id)
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
+    user = await user_service.update_user(user_id=id, dto=dto, audit_context=audit_context)
     response_dto = await user_service.get_user_with_access_profile(id)
     return APIResponse(
         success=True,
@@ -194,6 +199,7 @@ async def delete_user(
     summary="Assign a role to user",
 )
 async def assign_user_role(
+    request: Request,
     id: uuid.UUID,
     role_name: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -202,7 +208,8 @@ async def assign_user_role(
     """
     Assigns an authorization role group to a user account.
     """
-    user = await user_service.assign_role(id, role_name, current_user_id=current_user.id)
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
+    user = await user_service.assign_role(id, role_name, audit_context=audit_context)
     return APIResponse(
         success=True,
         message=f"Role '{role_name}' assigned to user successfully.",
@@ -218,6 +225,7 @@ async def assign_user_role(
     summary="Remove a role from user",
 )
 async def remove_user_role(
+    request: Request,
     id: uuid.UUID,
     role_name: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -226,7 +234,8 @@ async def remove_user_role(
     """
     Revokes an authorization role group from a user account.
     """
-    user = await user_service.remove_role(id, role_name, current_user_id=current_user.id)
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
+    user = await user_service.remove_role(id, role_name, audit_context=audit_context)
     return APIResponse(
         success=True,
         message=f"Role '{role_name}' removed from user successfully.",
@@ -264,6 +273,7 @@ async def get_user_access_profile(
     summary="Update user roles",
 )
 async def update_user_roles(
+    request: Request,
     id: uuid.UUID,
     dto: UserRoleUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -272,8 +282,9 @@ async def update_user_roles(
     """
     Updates the complete list of roles assigned to a user.
     """
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
     user = await user_service.update_user_roles(
-        user_id=id, dto=dto, current_user_id=current_user.id
+        user_id=id, dto=dto, audit_context=audit_context
     )
     # Refresh to get populated access profile
     profile_dto = await user_service.get_user_with_access_profile(id)
@@ -292,6 +303,7 @@ async def update_user_roles(
     summary="Update user permission overrides",
 )
 async def update_user_permission_overrides(
+    request: Request,
     id: uuid.UUID,
     dto: UserPermissionOverrideUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
@@ -300,8 +312,9 @@ async def update_user_permission_overrides(
     """
     Updates direct permission overrides (grants and revocations) for a user.
     """
+    audit_context = AuditContext(actor_id=current_user.id, actor_email=current_user.email, ip_address=request.client.host if request.client else None, user_agent=request.headers.get("user-agent"))
     user = await user_service.update_user_permission_overrides(
-        user_id=id, dto=dto, current_user_id=current_user.id
+        user_id=id, dto=dto, audit_context=audit_context
     )
     # Refresh to get populated access profile
     profile_dto = await user_service.get_user_with_access_profile(id)

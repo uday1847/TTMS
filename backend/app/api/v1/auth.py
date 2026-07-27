@@ -5,7 +5,7 @@ import uuid
 
 from app.api.dependencies.db import get_session
 from app.api.dependencies.auth import get_current_active_user
-from app.application.dtos.auth import LoginRequest, LoginResponse, ChangePasswordRequest
+from app.application.dtos.auth import LoginRequest, LoginResponse, ChangePasswordRequest, RefreshTokenRequest
 from app.application.services.authentication_service import AuthenticationService
 from app.application.services.session_service import SessionService
 from app.domain.entities.user import User
@@ -94,3 +94,13 @@ async def change_password(
         message="Password changed successfully. Please log in with your new password.",
         data=None
     )
+
+@router.post("/refresh", response_model=LoginResponse)
+async def refresh_token(
+    request: Request,
+    dto: RefreshTokenRequest,
+    auth_service: AuthenticationService = Depends(get_auth_service)
+):
+    ip_address = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+    return await auth_service.refresh_token(dto, ip_address=ip_address, user_agent=user_agent)

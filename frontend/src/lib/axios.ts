@@ -4,6 +4,7 @@ import { env } from '@/config/env'
 import { useAuthStore } from '@/stores/auth-store'
 import { parseApiError } from '@/shared/error';
 import { decodeJWT } from '@/utils/jwt.utils'
+import { queryClient } from '@/lib/query-client'
 
 export const api = axios.create({
   baseURL: env.VITE_API_BASE_URL,
@@ -55,6 +56,21 @@ api.interceptors.response.use(
                            originalRequest.url?.includes('/auth/reset-password')
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+      // Check for security invalidation
+      if ((error.response.data as any)?.detail === "Your permissions or account security settings have changed. Please log in again.") {
+        const authStore = useAuthStore.getState()
+        authStore.clearAuth()
+        queryClient.clear()
+        
+        // Notify other tabs
+        const channel = new BroadcastChannel('auth_sync')
+        channel.postMessage({ type: 'LOGOUT' })
+        channel.close()
+        
+        window.location.href = '/login?reason=security_update'
+        return Promise.reject(parseApiError(error))
+      }
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })

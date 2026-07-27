@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 
 from app.domain.entities.user_session import UserSession
 from app.domain.repositories.session_repository import SessionRepository
+from app.domain.enums.session_status import SessionStatus
 from app.core.security import security_settings
 
 class SessionService:
@@ -21,10 +22,14 @@ class SessionService:
         )
         return await self.session_repository.create(session)
 
+    async def get_by_jti(self, jti: str) -> UserSession | None:
+        return await self.session_repository.get_by_refresh_jti(jti)
+
     async def revoke_session(self, session_id: uuid.UUID) -> None:
         session = await self.session_repository.get_by_id(session_id)
         if session:
-            await self.session_repository.delete(session)
+            session.status = SessionStatus.REVOKED
+            await self.session_repository.update(session)
 
     async def revoke_all_sessions(self, user_id: uuid.UUID) -> None:
         await self.session_repository.revoke_all_for_user(user_id)

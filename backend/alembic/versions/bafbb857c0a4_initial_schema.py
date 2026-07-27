@@ -34,7 +34,7 @@ def upgrade() -> None:
     sa.Column('locked_until', sa.DateTime(), nullable=True),
     sa.Column('last_login_at', sa.DateTime(), nullable=True),
     sa.Column('profile_picture_url', sa.String(length=500), nullable=True),
-    sa.Column('token_version', sa.Integer(), nullable=False),
+    sa.Column('token_version', sa.Integer(), nullable=False, server_default='1'),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('clock_timestamp()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('clock_timestamp()'), nullable=False),
     sa.Column('created_by', sa.Uuid(), nullable=True),

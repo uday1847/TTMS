@@ -6,6 +6,14 @@ from app.domain.enums.permission_module import PermissionModule
 from app.domain.enums.login_result import LoginResult
 from app.domain.enums.session_status import SessionStatus
 from app.application.dtos.base import BaseDTO
+from dataclasses import dataclass
+
+@dataclass
+class AuditContext:
+    actor_id: uuid.UUID
+    actor_email: str
+    ip_address: str | None = None
+    user_agent: str | None = None
 
 class AuditResponse(BaseDTO):
     id: uuid.UUID

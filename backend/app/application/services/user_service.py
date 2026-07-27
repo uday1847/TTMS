@@ -4,6 +4,10 @@ from app.domain.entities.user import User
 from app.domain.repositories.user_repository import UserRepository
 from app.domain.repositories.role_repository import RoleRepository
 from app.application.dtos.users import UserCreate, UserUpdate, UserRoleUpdate, UserPermissionOverrideUpdate, UserResponse
+from app.application.dtos.audit import AuditContext
+from app.application.services.audit_service import AuditService
+from app.domain.enums.audit_action import AuditAction
+from app.domain.enums.permission_module import PermissionModule
 from app.domain.entities.user_permission import UserPermission
 from app.application.services.permission_cache_service import PermissionCacheService
 from app.core.security import security_settings
@@ -11,9 +15,10 @@ from app.domain.exceptions.base import ResourceNotFoundException, ValidationExce
 from app.domain.enums.user_status import UserStatus
 
 class UserService:
-    def __init__(self, user_repository: UserRepository, role_repository: RoleRepository):
+    def __init__(self, user_repository: UserRepository, role_repository: RoleRepository, audit_service: AuditService):
         self.user_repository = user_repository
         self.role_repository = role_repository
+        self.audit_service = audit_service
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> User:
         user = await self.user_repository.get_with_roles_and_permissions(user_id)
@@ -119,20 +124,28 @@ class UserService:
 
         return await self.get_user_with_access_profile(user.id)
 
-    async def update_user(self, user_id: uuid.UUID, dto: UserUpdate, current_user_id: uuid.UUID | None = None) -> User:
+    async def update_user(self, user_id: uuid.UUID, dto: UserUpdate, audit_context: AuditContext | None = None) -> User:
         user = await self.get_user_by_id(user_id)
+        
+        security_changed = False
+        
         if dto.first_name is not None:
             user.first_name = dto.first_name
         if dto.last_name is not None:
             user.last_name = dto.last_name
-        if dto.email is not None:
+        if dto.email is not None and dto.email != user.email:
             user.email = dto.email
-        if dto.username is not None:
+            security_changed = True
+        if dto.username is not None and dto.username != user.username:
             user.username = dto.username
+            security_changed = True
         if dto.phone is not None:
             user.phone = dto.phone
         if dto.is_active is not None:
-            user.status = UserStatus.ACTIVE if dto.is_active else UserStatus.INACTIVE
+            new_status = UserStatus.ACTIVE if dto.is_active else UserStatus.INACTIVE
+            if user.status != new_status:
+                user.status = new_status
+                security_changed = True
             
         if dto.role_ids is not None:
             user.roles = []
@@ -141,24 +154,43 @@ class UserService:
                 if role:
                     user.roles.append(role)
             PermissionCacheService.invalidate_user_permissions(str(user_id))
-            user.token_version += 1 # Invalidate existing tokens on role change
+            security_changed = True
             
-        if current_user_id is not None:
-            user.updated_by = current_user_id
+        if security_changed:
+            user.token_version += 1
+            
+        if audit_context is not None:
+            user.updated_by = audit_context.actor_id
+            if security_changed:
+                await self.audit_service.log_action(
+                    action=AuditAction.UPDATE,
+                    module=PermissionModule.USERS,
+                    table_name="users",
+                    record_id=user.id,
+                    new_values={"token_version": user.token_version, "event": "SECURITY_STATE_CHANGED"},
+                    user_id=audit_context.actor_id,
+                    ip_address=audit_context.ip_address,
+                    user_agent=audit_context.user_agent
+                )
             
         return await self.user_repository.update(user)
 
-    async def lock_user(self, user_id: uuid.UUID) -> User:
+    async def lock_user(self, user_id: uuid.UUID, audit_context: AuditContext | None = None) -> User:
         user = await self.get_user_by_id(user_id)
         user.status = UserStatus.LOCKED
         user.token_version += 1
+        if audit_context is not None:
+            user.updated_by = audit_context.actor_id
         return await self.user_repository.update(user)
 
-    async def unlock_user(self, user_id: uuid.UUID) -> User:
+    async def unlock_user(self, user_id: uuid.UUID, audit_context: AuditContext | None = None) -> User:
         user = await self.get_user_by_id(user_id)
         user.status = UserStatus.ACTIVE
         user.failed_login_attempts = 0
         user.locked_until = None
+        user.token_version += 1
+        if audit_context is not None:
+            user.updated_by = audit_context.actor_id
         return await self.user_repository.update(user)
 
 
@@ -209,7 +241,7 @@ class UserService:
                 return True
         return False
 
-    async def assign_role(self, user_id: uuid.UUID, role_name: str, current_user_id: uuid.UUID | None = None) -> User:
+    async def assign_role(self, user_id: uuid.UUID, role_name: str, audit_context: AuditContext | None = None) -> User:
         user = await self.get_user_by_id(user_id)
         role = await self.role_repository.get_by_name(role_name)
         if not role:
@@ -217,14 +249,14 @@ class UserService:
         
         if not any(r.id == role.id for r in user.roles):
             user.roles.append(role)
-            if current_user_id:
-                user.updated_by = current_user_id
+            if audit_context:
+                user.updated_by = audit_context.actor_id
             user.token_version += 1
             PermissionCacheService.invalidate_user_permissions(str(user_id))
             return await self.user_repository.update(user)
         return user
 
-    async def remove_role(self, user_id: uuid.UUID, role_name: str, current_user_id: uuid.UUID | None = None) -> User:
+    async def remove_role(self, user_id: uuid.UUID, role_name: str, audit_context: AuditContext | None = None) -> User:
         user = await self.get_user_by_id(user_id)
         role = await self.role_repository.get_by_name(role_name)
         if not role:
@@ -234,14 +266,14 @@ class UserService:
         user.roles = [r for r in user.roles if r.id != role.id]
         
         if len(user.roles) < initial_count:
-            if current_user_id:
-                user.updated_by = current_user_id
+            if audit_context:
+                user.updated_by = audit_context.actor_id
             user.token_version += 1
             PermissionCacheService.invalidate_user_permissions(str(user_id))
             return await self.user_repository.update(user)
         return user
 
-    async def update_user_roles(self, *, user_id: uuid.UUID, dto: UserRoleUpdate, current_user_id: uuid.UUID) -> User:
+    async def update_user_roles(self, *, user_id: uuid.UUID, dto: UserRoleUpdate, audit_context: AuditContext) -> User:
         target_user = await self.get_user_by_id(user_id)
         
         # Self-protection logic
@@ -257,17 +289,28 @@ class UserService:
             
         will_have_admin = any(r.name == admin_role_name for r in new_roles)
         
-        if target_user.id == current_user_id and had_admin and not will_have_admin:
+        if target_user.id == audit_context.actor_id and had_admin and not will_have_admin:
             raise ValidationException("You cannot remove your own last administrator role.")
             
         target_user.roles = new_roles
-        target_user.updated_by = current_user_id
+        target_user.updated_by = audit_context.actor_id
         target_user.token_version += 1
         PermissionCacheService.invalidate_user_permissions(str(target_user.id))
         
+        await self.audit_service.log_action(
+            action=AuditAction.UPDATE,
+            module=PermissionModule.USERS,
+            table_name="users",
+            record_id=target_user.id,
+            new_values={"event": "ROLE_ASSIGNMENT_CHANGED", "token_version": target_user.token_version},
+            user_id=audit_context.actor_id,
+            ip_address=audit_context.ip_address,
+            user_agent=audit_context.user_agent
+        )
+        
         return await self.user_repository.update(target_user)
 
-    async def update_user_permission_overrides(self, *, user_id: uuid.UUID, dto: UserPermissionOverrideUpdate, current_user_id: uuid.UUID) -> User:
+    async def update_user_permission_overrides(self, *, user_id: uuid.UUID, dto: UserPermissionOverrideUpdate, audit_context: AuditContext) -> User:
         target_user = await self.get_user_by_id(user_id)
         
         from sqlalchemy import select
@@ -296,7 +339,7 @@ class UserService:
                 user_id=target_user.id,
                 permission_id=perm_map[p_name].id,
                 is_granted=True,
-                created_by=current_user_id
+                created_by=audit_context.actor_id
             )
             up.permission = perm_map[p_name]
             target_user.direct_permissions.append(up)
@@ -306,13 +349,24 @@ class UserService:
                 user_id=target_user.id,
                 permission_id=perm_map[p_name].id,
                 is_granted=False,
-                created_by=current_user_id
+                created_by=audit_context.actor_id
             )
             up.permission = perm_map[p_name]
             target_user.direct_permissions.append(up)
             
-        target_user.updated_by = current_user_id
+        target_user.updated_by = audit_context.actor_id
         target_user.token_version += 1
         PermissionCacheService.invalidate_user_permissions(str(target_user.id))
+        
+        await self.audit_service.log_action(
+            action=AuditAction.UPDATE,
+            module=PermissionModule.USERS,
+            table_name="users",
+            record_id=target_user.id,
+            new_values={"event": "PERMISSION_OVERRIDE_CHANGED", "token_version": target_user.token_version},
+            user_id=audit_context.actor_id,
+            ip_address=audit_context.ip_address,
+            user_agent=audit_context.user_agent
+        )
         
         return await self.user_repository.update(target_user)

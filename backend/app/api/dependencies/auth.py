@@ -23,9 +23,14 @@ def get_user_service(session: AsyncSession = Depends(get_session)) -> UserServic
     """
     Dependency injection factory constructing the UserService.
     """
+    from app.infrastructure.repositories.audit_repository import SQLAlchemyAuditRepository
+    from app.application.services.audit_service import AuditService
+    
     user_repo = SQLAlchemyUserRepository(session)
     role_repo = SQLAlchemyRoleRepository(session)
-    return UserService(user_repo, role_repo)
+    audit_repo = SQLAlchemyAuditRepository(session)
+    audit_service = AuditService(audit_repo)
+    return UserService(user_repo, role_repo, audit_service)
 
 
 async def get_current_user(
@@ -94,6 +99,14 @@ async def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found or has been deleted.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token_version = payload.get("token_version")
+    if token_version is None or user.token_version != token_version:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your permissions or account security settings have changed. Please log in again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

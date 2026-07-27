@@ -1,4 +1,3 @@
-import { Loader2 } from 'lucide-react';
 import { useDeleteTractor } from '../hooks/use-tractors';
 import type { TractorResponseDto } from '../types/tractor.types';
 import { showApiError } from '@/shared/error';

@@ -13,7 +13,7 @@ class JWTService:
         to_encode = {
             "sub": str(user_id),
             "email": email,
-            "version": token_version,
+            "token_version": token_version,
             "roles": roles or [],
             "permissions": permissions,
             "iss": security_settings.TOKEN_ISSUER,
@@ -25,11 +25,12 @@ class JWTService:
         return encoded_jwt
 
     @staticmethod
-    def create_refresh_token(user_id: uuid.UUID, jti: str) -> str:
+    def create_refresh_token(user_id: uuid.UUID, jti: str, token_version: int) -> str:
         expire = datetime.now(timezone.utc) + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS)
         to_encode = {
             "sub": str(user_id),
             "jti": jti,
+            "token_version": token_version,
             "iss": security_settings.TOKEN_ISSUER,
             "aud": security_settings.TOKEN_AUDIENCE,
             "exp": expire,
