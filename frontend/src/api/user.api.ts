@@ -1,4 +1,4 @@
-import { api } from './axios';
+import { api } from '@/lib/axios';
 import type { APIResponse } from '@/shared/types/api.types';
 import type {
   PaginatedUsersDto,

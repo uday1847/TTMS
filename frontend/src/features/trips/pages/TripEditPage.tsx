@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router';
 import { useTrip, useUpdateTrip } from '../hooks/use-trips';
+import { showApiError } from '@/shared/error';
 import { TripForm } from '../components/TripForm';
 import { useNotificationStore } from '@/stores/notification-store';
 import { Loader2 } from 'lucide-react';
@@ -41,11 +42,7 @@ export default function TripEditPage() {
       });
       navigate('/trips');
     } catch (error: any) {
-      addNotification({
-        type: 'error',
-        title: 'Failed to update trip',
-        message: error.response?.data?.detail || error.message || 'An error occurred',
-      });
+      showApiError(error, 'Failed to update trip');
     }
   };
 

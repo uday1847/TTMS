@@ -5,6 +5,7 @@ import { Pagination, SearchInput } from '@/shared/components/data-table'
 import { PermissionGuard } from '@/shared/auth'
 import { Plus } from 'lucide-react'
 import type { UserResponse, UserCreate, UserUpdate } from '../api'
+import { showApiError } from '@/shared/error'
 
 export default function UsersPage() {
   const [page, setPage] = useState(1)
@@ -40,7 +41,7 @@ export default function UsersPage() {
       }
       setIsFormOpen(false)
     } catch (error) {
-      // Error handled by hook's onError Toaster
+      showApiError(error, editingUser ? 'Update Failed' : 'Create Failed')
     }
   }
 

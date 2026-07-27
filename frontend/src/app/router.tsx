@@ -17,7 +17,10 @@ const TractorListPage = lazy(() => import('@/features/tractors/pages/TractorList
 const TractorCreatePage = lazy(() => import('@/features/tractors/pages/TractorCreatePage'))
 const TractorDetailsPage = lazy(() => import('@/features/tractors/pages/TractorDetailsPage'))
 const TractorEditPage = lazy(() => import('@/features/tractors/pages/TractorEditPage'))
-const PartiesPage = lazy(() => import('@/features/parties/pages/parties-page'))
+const PartyListPage = lazy(() => import('@/features/parties/pages/PartyListPage'))
+const PartyCreatePage = lazy(() => import('@/features/parties/pages/PartyCreatePage'))
+const PartyDetailsPage = lazy(() => import('@/features/parties/pages/PartyDetailsPage'))
+const PartyEditPage = lazy(() => import('@/features/parties/pages/PartyEditPage'))
 const QuarriesPage = lazy(() => import('@/features/quarries/pages/quarries-page'))
 const MaterialsPage = lazy(() => import('@/features/materials/pages/materials-page'))
 const TripListPage = lazy(() => import('@/features/trips/pages/TripListPage'))
@@ -167,14 +170,47 @@ export function AppRouter() {
                 />
               </Route>
             </Route>
-            <Route
-              path="/parties"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <PartiesPage />
-                </Suspense>
-              }
-            />
+            {/* Parties Routes */}
+            <Route path="/parties">
+              <Route element={<ProtectedRoute permission="parties:read" />}>
+                <Route
+                  index
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <PartyListPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <PartyDetailsPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="parties:create" />}>
+                <Route
+                  path="create"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <PartyCreatePage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute permission="parties:update" />}>
+                <Route
+                  path=":id/edit"
+                  element={
+                    <Suspense fallback={<PageLoader />}>
+                      <PartyEditPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+            </Route>
             <Route
               path="/quarries"
               element={

@@ -1,5 +1,7 @@
+import { Loader2 } from 'lucide-react';
 import { useDeleteTractor } from '../hooks/use-tractors';
 import type { TractorResponseDto } from '../types/tractor.types';
+import { showApiError } from '@/shared/error';
 
 interface DeleteTractorDialogProps {
   tractor: TractorResponseDto;
@@ -18,8 +20,8 @@ export function DeleteTractorDialog({ tractor, isOpen, onClose, onSuccess }: Del
       await deleteTractor.mutateAsync(tractor.id);
       if (onSuccess) onSuccess();
       onClose();
-    } catch (error) {
-      console.error('Failed to delete tractor', error);
+    } catch (error: any) {
+      showApiError(error, 'Failed to delete tractor');
     }
   };
 

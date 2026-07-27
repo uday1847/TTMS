@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 import { env } from '@/config/env'
 import { useAuthStore } from '@/stores/auth-store'
-import { parseApiError } from '@/shared/utils/api-error'
+import { parseApiError } from '@/shared/error';
 import { decodeJWT } from '@/utils/jwt.utils'
 
 export const api = axios.create({

@@ -1,5 +1,6 @@
 import { TripForm } from '../components/TripForm';
 import { useCreateTrip } from '../hooks/use-trips';
+import { showApiError } from '@/shared/error';
 import { useNotificationStore } from '@/stores/notification-store';
 import { useNavigate } from 'react-router';
 import type { TripFormData } from '../schemas/trip.schema';
@@ -19,11 +20,7 @@ export default function TripCreatePage() {
       });
       navigate('/trips');
     } catch (error: any) {
-      addNotification({
-        type: 'error',
-        title: 'Failed to create trip',
-        message: error.response?.data?.detail || error.message || 'An error occurred',
-      });
+      showApiError(error, 'Failed to create trip');
     }
   };
 

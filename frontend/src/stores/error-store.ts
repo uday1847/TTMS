@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ApiError } from '@/shared/utils/api-error'
+import type { ApiError } from '@/shared/error';
 
 interface GlobalErrorState {
   error: ApiError | null

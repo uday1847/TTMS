@@ -4,6 +4,7 @@ import { useUserAccessProfile, useUpdateUserRoles, useUpdateUserPermissions } fr
 import { useRoles } from '@/features/roles/hooks/use-roles'
 import { usePermissions } from '@/features/permissions/hooks/use-permissions'
 import { PermissionGuard } from '@/shared/auth'
+import { showApiError } from '@/shared/error'
 
 interface UserAccessProfileDrawerProps {
   userId: string | undefined
@@ -64,7 +65,7 @@ export function UserAccessProfileDrawer({ userId, isOpen, onClose }: UserAccessP
       await updatePermissions({ id: userId, grantPermissions: grantedOverrides, revokePermissions: revokedOverrides })
       onClose()
     } catch (e) {
-      console.error(e)
+      showApiError(e, 'Failed to update access profile')
     }
   }
 

@@ -13,8 +13,5 @@ export function useUpdateUser() {
       queryClient.invalidateQueries({ queryKey: ['user', data.id] })
       addNotification({ title: 'Success', message: 'User updated successfully.', type: 'success' })
     },
-    onError: (error: any) => {
-      addNotification({ title: 'Error', message: error.message || 'Failed to update user.', type: 'error' })
-    },
   })
 }

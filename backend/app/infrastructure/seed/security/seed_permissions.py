@@ -17,7 +17,7 @@ class PermissionSeed(BaseSeed):
             # Check if permission already exists by ID or by code
             existing_perm = await perm_repo.get_by_id(definition["id"])
             if not existing_perm:
-                existing_perm = await perm_repo.get_by_code(definition["code"])
+                existing_perm = await perm_repo.get_by_name(definition["code"])
 
             if existing_perm:
                 skipped_count += 1
@@ -26,7 +26,7 @@ class PermissionSeed(BaseSeed):
             # Create new permission
             new_perm = Permission(
                 id=definition["id"],
-                code=definition["code"],
+                name=definition["code"],
                 description=definition["description"],
                 is_active=True,
                 created_by=SYSTEM_USER_ID,

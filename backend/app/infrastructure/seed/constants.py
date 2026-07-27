@@ -64,57 +64,42 @@ ROLE_DEFINITIONS = [
     },
 ]
 
-# Permission Seeding Constants (Permission IDs)
-PERMISSION_USER_CREATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000201")
-PERMISSION_USER_READ_ID = uuid.UUID("00000000-0000-0000-0000-000000000202")
-PERMISSION_USER_UPDATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000203")
-PERMISSION_USER_DELETE_ID = uuid.UUID("00000000-0000-0000-0000-000000000204")
-PERMISSION_VEHICLE_CREATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000205")
-PERMISSION_VEHICLE_UPDATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000206")
-PERMISSION_DRIVER_CREATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000207")
-PERMISSION_CUSTOMER_CREATE_ID = uuid.UUID("00000000-0000-0000-0000-000000000208")
-
+# Permission Seeding Constants
 PERMISSION_DEFINITIONS = [
-    {
-        "id": PERMISSION_USER_CREATE_ID,
-        "code": "User.Create",
-        "description": "Ability to create new system users.",
-    },
-    {
-        "id": PERMISSION_USER_READ_ID,
-        "code": "User.Read",
-        "description": "Ability to read and view user directories.",
-    },
-    {
-        "id": PERMISSION_USER_UPDATE_ID,
-        "code": "User.Update",
-        "description": "Ability to edit and update existing user accounts.",
-    },
-    {
-        "id": PERMISSION_USER_DELETE_ID,
-        "code": "User.Delete",
-        "description": "Ability to soft-delete or disable user profiles.",
-    },
-    {
-        "id": PERMISSION_VEHICLE_CREATE_ID,
-        "code": "Vehicle.Create",
-        "description": "Ability to register new fleet tractors and trailers.",
-    },
-    {
-        "id": PERMISSION_VEHICLE_UPDATE_ID,
-        "code": "Vehicle.Update",
-        "description": "Ability to edit parameters of active fleet assets.",
-    },
-    {
-        "id": PERMISSION_DRIVER_CREATE_ID,
-        "code": "Driver.Create",
-        "description": "Ability to register vehicle drivers and licensing terms.",
-    },
-    {
-        "id": PERMISSION_CUSTOMER_CREATE_ID,
-        "code": "Customer.Create",
-        "description": "Ability to register new customer billing accounts.",
-    },
+    {"id": uuid.uuid4(), "code": "users:read", "description": "Read users"},
+    {"id": uuid.uuid4(), "code": "users:create", "description": "Create users"},
+    {"id": uuid.uuid4(), "code": "users:update", "description": "Update users"},
+    {"id": uuid.uuid4(), "code": "users:delete", "description": "Delete users"},
+    {"id": uuid.uuid4(), "code": "users:role_assign", "description": "Assign roles to users"},
+    {"id": uuid.uuid4(), "code": "drivers:read", "description": "Read drivers"},
+    {"id": uuid.uuid4(), "code": "drivers:create", "description": "Create drivers"},
+    {"id": uuid.uuid4(), "code": "drivers:update", "description": "Update drivers"},
+    {"id": uuid.uuid4(), "code": "drivers:delete", "description": "Delete drivers"},
+    {"id": uuid.uuid4(), "code": "tractors:read", "description": "Read tractors"},
+    {"id": uuid.uuid4(), "code": "tractors:create", "description": "Create tractors"},
+    {"id": uuid.uuid4(), "code": "tractors:update", "description": "Update tractors"},
+    {"id": uuid.uuid4(), "code": "tractors:delete", "description": "Delete tractors"},
+    {"id": uuid.uuid4(), "code": "trips:read", "description": "Read trips"},
+    {"id": uuid.uuid4(), "code": "trips:create", "description": "Create trips"},
+    {"id": uuid.uuid4(), "code": "trips:update", "description": "Update trips"},
+    {"id": uuid.uuid4(), "code": "trips:delete", "description": "Delete trips"},
+    {"id": uuid.uuid4(), "code": "parties:read", "description": "Read parties"},
+    {"id": uuid.uuid4(), "code": "parties:create", "description": "Create parties"},
+    {"id": uuid.uuid4(), "code": "parties:update", "description": "Update parties"},
+    {"id": uuid.uuid4(), "code": "parties:delete", "description": "Delete parties"},
+    {"id": uuid.uuid4(), "code": "expenses:read", "description": "Read expenses"},
+    {"id": uuid.uuid4(), "code": "expenses:create", "description": "Create expenses"},
+    {"id": uuid.uuid4(), "code": "expenses:update", "description": "Update expenses"},
+    {"id": uuid.uuid4(), "code": "expenses:delete", "description": "Delete expenses"},
+    {"id": uuid.uuid4(), "code": "permissions:read", "description": "Read permissions"},
+    {"id": uuid.uuid4(), "code": "permissions:create", "description": "Create permissions"},
+    {"id": uuid.uuid4(), "code": "permissions:update", "description": "Update permissions"},
+    {"id": uuid.uuid4(), "code": "permissions:delete", "description": "Delete permissions"},
+    {"id": uuid.uuid4(), "code": "roles:read", "description": "Read roles"},
+    {"id": uuid.uuid4(), "code": "roles:create", "description": "Create roles"},
+    {"id": uuid.uuid4(), "code": "roles:update", "description": "Update roles"},
+    {"id": uuid.uuid4(), "code": "roles:delete", "description": "Delete roles"},
+    {"id": uuid.uuid4(), "code": "roles:permission_assign", "description": "Assign permissions to roles"},
 ]
 
 # Super Admin Seeding Constants

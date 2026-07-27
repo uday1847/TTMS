@@ -12,8 +12,5 @@ export function useDeleteUser() {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       addNotification({ title: 'Success', message: 'User deleted successfully.', type: 'success' })
     },
-    onError: (error: any) => {
-      addNotification({ title: 'Error', message: error.message || 'Failed to delete user.', type: 'error' })
-    },
   })
 }

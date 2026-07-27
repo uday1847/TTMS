@@ -25,6 +25,7 @@ export interface DriverResponseDto {
 
 export interface DriverCreateDto {
   name: string;
+  userId?: string | null;
   address?: string | null;
   employeeCode: string;
   licenseNumber: string;

@@ -1,40 +1,40 @@
-import { useDeleteTrip } from '../hooks/use-trips';
+import { useDeleteParty } from '../hooks/use-parties';
 import { useNotificationStore } from '@/stores/notification-store';
 import { Loader2 } from 'lucide-react';
 import { showApiError } from '@/shared/error';
 
-interface DeleteTripDialogProps {
-  tripId: string;
-  tripNumber: string;
+interface DeletePartyDialogProps {
+  partyId: string;
+  partyName: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export function DeleteTripDialog({
-  tripId,
-  tripNumber,
+export function DeletePartyDialog({
+  partyId,
+  partyName,
   isOpen,
   onClose,
   onSuccess,
-}: DeleteTripDialogProps) {
-  const { mutateAsync: deleteTrip, isPending } = useDeleteTrip();
+}: DeletePartyDialogProps) {
+  const { mutateAsync: deleteParty, isPending } = useDeleteParty();
   const { addNotification } = useNotificationStore();
 
   if (!isOpen) return null;
 
   const handleDelete = async () => {
     try {
-      await deleteTrip(tripId);
+      await deleteParty(partyId);
       addNotification({
         type: 'success',
-        title: 'Trip Deleted',
-        message: `Trip ${tripNumber} has been successfully deleted.`,
+        title: 'Party Deleted',
+        message: `Party ${partyName} has been successfully deleted.`,
       });
       onSuccess?.();
       onClose();
     } catch (error: any) {
-      showApiError(error, 'Failed to delete trip');
+      showApiError(error, 'Failed to delete party');
     }
   };
 
@@ -44,9 +44,8 @@ export function DeleteTripDialog({
         <div className="p-6">
           <h3 className="text-lg font-medium">Are you absolutely sure?</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            This action cannot be undone. This will permanently delete the trip
-            <span className="font-semibold text-foreground"> {tripNumber}</span>. Note that only PENDING trips without
-            associated expenses or invoices can be deleted.
+            This party will be soft deleted. If it is linked to active trips, deletion will be blocked.
+            <span className="font-semibold text-foreground"> {partyName}</span> will be marked as deleted.
           </p>
         </div>
         <div className="px-6 py-4 bg-muted/50 flex justify-end space-x-3 border-t">
@@ -63,7 +62,7 @@ export function DeleteTripDialog({
             disabled={isPending}
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete Trip
+            Delete Party
           </button>
         </div>
       </div>

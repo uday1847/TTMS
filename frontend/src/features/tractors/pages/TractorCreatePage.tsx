@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { TractorForm } from '../components/TractorForm';
 import { useCreateTractor } from '../hooks/use-tractors';
+import { showApiError } from '@/shared/error';
 import type { TractorFormValues } from '../schemas/tractor.schema';
 
 export default function TractorCreatePage() {
@@ -13,8 +14,8 @@ export default function TractorCreatePage() {
         ...data,
       });
       navigate('/tractors');
-    } catch (error) {
-      console.error('Failed to create tractor', error);
+    } catch (error: any) {
+      showApiError(error, 'Failed to create tractor');
     }
   };
 

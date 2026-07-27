@@ -18,6 +18,9 @@ class PartyBase(BaseModel):
             for k, v in list(data.items()):
                 if isinstance(v, str):
                     v = v.strip()
+                    if v == "":
+                        data[k] = None
+                        continue
                     if k in ["gst_number", "pan_number"]:
                         # Convert taxes identifiers to uppercase
                         v = v.upper()
@@ -201,6 +204,9 @@ class PartyUpdate(BaseModel):
             for k, v in list(data.items()):
                 if isinstance(v, str):
                     v = v.strip()
+                    if v == "":
+                        data[k] = None
+                        continue
                     if k in ["gst_number", "pan_number"]:
                         v = v.upper()
                     if k == "name":

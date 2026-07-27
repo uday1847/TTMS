@@ -53,6 +53,14 @@ export default function DashboardPage() {
               Manage Trips
             </Link>
           </PermissionGuard>
+          <PermissionGuard permission="parties:read">
+            <Link
+              to="/parties"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Manage Parties
+            </Link>
+          </PermissionGuard>
         </div>
       </div>
     </div>

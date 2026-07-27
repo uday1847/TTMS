@@ -3,6 +3,7 @@ import { useUpdateTripStatus } from '../hooks/use-trips';
 import type { TripResponseDto } from '../types/trip.types';
 import { TripStatus } from '../types/trip.types';
 import { useNotificationStore } from '@/stores/notification-store';
+import { showApiError } from '@/shared/error';
 import { Loader2 } from 'lucide-react';
 
 interface TripStatusDialogProps {
@@ -47,11 +48,7 @@ export function TripStatusDialog({ trip, isOpen, onClose }: TripStatusDialogProp
       });
       onClose();
     } catch (error: any) {
-      addNotification({
-        type: 'error',
-        title: 'Update Failed',
-        message: error.response?.data?.detail || 'Failed to update trip status.'
-      });
+      showApiError(error, 'Update Failed');
     }
   };
 

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../api/auth.api'
 import { useAuthStore } from '@/stores/auth-store'
 import { useNotificationStore } from '@/stores/notification-store'
+import { showApiError } from '@/shared/error'
 import { useNavigate } from 'react-router'
 import type { LoginFormData, ForgotPasswordFormData, ResetPasswordFormData, ChangePasswordFormData } from '../schemas/auth.schema'
 
@@ -34,22 +35,14 @@ export function useAuth() {
       navigate('/dashboard')
     },
     onError: (error: any) => {
-      addNotification({
-        title: 'Login Failed',
-        message: error?.message || 'Invalid credentials',
-        type: 'error',
-      })
+      showApiError(error, 'Login Failed')
     },
   })
 
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logout(),
     onError: (error: any) => {
-      addNotification({
-        title: 'Logout Notice',
-        message: error?.message || 'Server logout is unavailable.',
-        type: 'warning',
-      })
+      showApiError(error, 'Logout Notice')
     },
     onSettled: () => {
       clearAuth()
@@ -67,11 +60,7 @@ export function useAuth() {
       })
     },
     onError: (error: any) => {
-      addNotification({
-        title: 'Error',
-        message: error?.message || 'Failed to process request',
-        type: 'error',
-      })
+      showApiError(error, 'Error')
     },
   })
 
@@ -86,11 +75,7 @@ export function useAuth() {
       navigate('/login')
     },
     onError: (error: any) => {
-      addNotification({
-        title: 'Reset Failed',
-        message: error?.message || 'Failed to reset password',
-        type: 'error',
-      })
+      showApiError(error, 'Reset Failed')
     },
   })
 
@@ -104,11 +89,7 @@ export function useAuth() {
       })
     },
     onError: (error: any) => {
-      addNotification({
-        title: 'Update Failed',
-        message: error?.message || 'Failed to change password',
-        type: 'error',
-      })
+      showApiError(error, 'Update Failed')
     },
   })
 

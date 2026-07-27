@@ -12,6 +12,7 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
+from app.infrastructure.seed.constants import PERMISSION_DEFINITIONS
 from app.domain.entities.refresh_token import RefreshToken
 from app.domain.exceptions.auth import (
     InvalidCredentialsException,
@@ -59,6 +60,10 @@ class AuthService:
             user = await self.user_repository.get_by_email(dto.username_or_email)
             if not user:
                 user = await self.user_repository.get_by_username(dto.username_or_email)
+            
+            if user:
+                # Eager load roles and permissions
+                user = await self.user_repository.get_with_roles_and_permissions(user.id)
 
             if not user:
                 logger.warning(f"Login failed: User {dto.username_or_email} not found.")
@@ -74,7 +79,27 @@ class AuthService:
                 raise InvalidCredentialsException()
 
             # Generate tokens
-            access_token = create_access_token(user.id)
+            roles_list = [r.name for r in user.roles] if user.roles else []
+            permissions_list = []
+            
+            if "Super Admin" in roles_list:
+                permissions_list = [p["code"] for p in PERMISSION_DEFINITIONS]
+            else:
+                for r in user.roles:
+                    permissions_list.extend([p.name for p in r.permissions])
+                for dp in user.direct_permissions:
+                    permissions_list.append(dp.permission.name)
+            
+            # Deduplicate permissions
+            permissions_list = list(set(permissions_list))
+            
+            access_token = create_access_token(
+                subject=user.id,
+                email=user.email,
+                username=user.username,
+                roles=roles_list,
+                permissions=permissions_list,
+            )
             refresh_token_str = create_refresh_token(user.id)
 
             # Save refresh token
@@ -136,9 +161,33 @@ class AuthService:
             # Revoke old tokens
             await self.refresh_token_repository.revoke_user_tokens(user_id)
 
+            # Fetch user with roles to regenerate claims
+            user = await self.user_repository.get_with_roles_and_permissions(user_id)
+            if not user or not user.is_active:
+                raise InvalidCredentialsException("User account not found or disabled.")
+
+            roles_list = [r.name for r in user.roles] if user.roles else []
+            permissions_list = []
+            
+            if "Super Admin" in roles_list:
+                permissions_list = [p["code"] for p in PERMISSION_DEFINITIONS]
+            else:
+                for r in user.roles:
+                    permissions_list.extend([p.name for p in r.permissions])
+                for dp in user.direct_permissions:
+                    permissions_list.append(dp.permission.name)
+            
+            permissions_list = list(set(permissions_list))
+
             # Generate fresh token rotation pair
-            new_access_token = create_access_token(user_id)
-            new_refresh_token_str = create_refresh_token(user_id)
+            new_access_token = create_access_token(
+                subject=user.id,
+                email=user.email,
+                username=user.username,
+                roles=roles_list,
+                permissions=permissions_list,
+            )
+            new_refresh_token_str = create_refresh_token(user.id)
 
             expires_at = datetime.now(timezone.utc) + timedelta(days=7)
             new_refresh_token_entity = RefreshToken(

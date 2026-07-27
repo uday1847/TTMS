@@ -20,7 +20,7 @@ class SystemUserSeed(BaseSeed):
         if not system_user:
             system_user = await user_repo.get_by_username("system")
         if not system_user:
-            system_user = await user_repo.get_by_email("system@ttms.local")
+            system_user = await user_repo.get_by_email("system@ttms.com")
             
         if system_user:
             self.logger.info("[Seed] System User          SKIP (exists)")
@@ -33,7 +33,7 @@ class SystemUserSeed(BaseSeed):
         system_user = User(
             id=SYSTEM_USER_ID,
             username="system",
-            email="system@ttms.local",
+            email="system@ttms.com",
             password_hash=dummy_password_hash,
             first_name="System",
             last_name="User",

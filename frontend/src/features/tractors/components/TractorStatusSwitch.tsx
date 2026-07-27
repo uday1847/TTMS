@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useUpdateTractorStatus } from '../hooks/use-tractors';
+import { showApiError } from '@/shared/error';
 import type { TractorResponseDto } from '../types/tractor.types';
 
 interface TractorStatusSwitchProps {
@@ -19,9 +20,9 @@ export function TractorStatusSwitch({ tractor }: TractorStatusSwitchProps) {
         id: tractor.id,
         isActive: newStatus,
       });
-    } catch (error) {
+    } catch (error: any) {
       setIsActive(tractor.is_active);
-      console.error('Failed to update tractor status', error);
+      showApiError(error, 'Failed to update status');
     }
   };
 

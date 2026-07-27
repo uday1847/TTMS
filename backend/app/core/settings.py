@@ -1,5 +1,5 @@
 import sys
-from pydantic import Field, ValidationError
+from pydantic import Field, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,9 +8,15 @@ class Settings(BaseSettings):
     APP_NAME: str = "TTMS"
     PROJECT_NAME: str = "Transport Tractor Management System"
     APP_VERSION: str = "1.0.0"
+    ENVIRONMENT: str = "development"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     API_V1_PREFIX: str = "/api/v1"
+
+    # Initial Superuser Settings
+    FIRST_SUPERUSER_EMAIL: str = "admin@ttms.local"
+    FIRST_SUPERUSER_USERNAME: str = "admin"
+    FIRST_SUPERUSER_PASSWORD: str | None = None
 
     # Required Database and Security Settings
     DATABASE_URL: str
@@ -33,6 +39,18 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore",
     )
+
+    @model_validator(mode="after")
+    def validate_superuser_password(self) -> "Settings":
+        if self.ENVIRONMENT == "production" and not self.FIRST_SUPERUSER_PASSWORD:
+            raise ValueError(
+                "FIRST_SUPERUSER_PASSWORD is required in production"
+            )
+
+        if not self.FIRST_SUPERUSER_PASSWORD:
+            self.FIRST_SUPERUSER_PASSWORD = "Admin@123"
+
+        return self
 
 
 try:

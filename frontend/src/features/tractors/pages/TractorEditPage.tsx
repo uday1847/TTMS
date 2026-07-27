@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router';
 import { TractorForm } from '../components/TractorForm';
 import { useTractor, useUpdateTractor } from '../hooks/use-tractors';
+import { showApiError } from '@/shared/error';
 import type { TractorFormValues } from '../schemas/tractor.schema';
 
 export default function TractorEditPage() {
@@ -28,8 +29,8 @@ export default function TractorEditPage() {
         data,
       });
       navigate('/tractors');
-    } catch (error) {
-      console.error('Failed to update tractor', error);
+    } catch (error: any) {
+      showApiError(error, 'Failed to update tractor');
     }
   };
 

@@ -1,5 +1,6 @@
 import { useDeleteUser } from '../hooks/use-delete-user'
 import { Loader2 } from 'lucide-react'
+import { showApiError } from '@/shared/error'
 
 interface UserDeleteDialogProps {
   userId: string
@@ -36,6 +37,9 @@ export function UserDeleteDialog({ userId, userName, isOpen, onClose }: UserDele
               mutate(userId, {
                 onSuccess: () => {
                   onClose()
+                },
+                onError: (error) => {
+                  showApiError(error, 'Delete Failed')
                 }
               })
             }}

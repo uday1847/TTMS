@@ -1,5 +1,6 @@
 import { FormSwitch } from '@/shared/components/form'
 import { useToggleUserStatus } from '../hooks/use-toggle-user-status'
+import { showApiError } from '@/shared/error'
 
 interface UserStatusSwitchProps {
   userId: string
@@ -15,7 +16,10 @@ export function UserStatusSwitch({ userId, isActive, disabled }: UserStatusSwitc
       checked={isActive}
       disabled={disabled || isPending}
       onChange={(e) => {
-        mutate({ id: userId, isActive: e.target.checked })
+        mutate(
+          { id: userId, isActive: e.target.checked },
+          { onError: (error) => showApiError(error, 'Status Update Failed') }
+        )
       }}
     />
   )

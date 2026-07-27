@@ -27,3 +27,11 @@ class SQLAlchemyPermissionRepository(SQLAlchemyBaseRepository[Permission], Permi
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_by_name(self, name: str) -> Permission | None:
+        stmt = select(Permission).where(
+            Permission.name == name,
+            Permission.deleted_at.is_(None)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()

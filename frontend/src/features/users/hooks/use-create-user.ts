@@ -12,8 +12,5 @@ export function useCreateUser() {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       addNotification({ title: 'Success', message: 'User created successfully.', type: 'success' })
     },
-    onError: (error: any) => {
-      addNotification({ title: 'Error', message: error.message || 'Failed to create user.', type: 'error' })
-    },
   })
 }

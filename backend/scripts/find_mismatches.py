@@ -1,66 +1,112 @@
 import os
-import ast
-import inspect
+import re
+import json
+import httpx
+import asyncio
 
-def get_service_methods():
-    import sys
-    sys.path.insert(0, os.getcwd())
+FRONTEND_FEATURES_DIR = "../../frontend/src/features"
+
+async def fetch_openapi():
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get("http://localhost:8000/openapi.json")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as e:
+        print(f"Failed to fetch openapi.json: {e}")
+        return None
+
+def extract_ts_interfaces(directory):
+    interfaces = {}
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".types.ts") or file.endswith(".schema.ts") or file.endswith(".ts"):
+                path = os.path.join(root, file)
+                with open(path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    # A naive regex to grab interfaces and their properties
+                    matches = re.finditer(r'export\s+interface\s+(\w+)\s*{([^}]+)}', content)
+                    for match in matches:
+                        name = match.group(1)
+                        body = match.group(2)
+                        
+                        props = {}
+                        prop_matches = re.finditer(r'(\w+)(\??)\s*:\s*([^;]+);', body)
+                        for pm in prop_matches:
+                            p_name = pm.group(1)
+                            p_opt = bool(pm.group(2))
+                            p_type = pm.group(3).strip()
+                            props[p_name] = {"optional": p_opt, "type": p_type}
+                            
+                        interfaces[name] = props
+    return interfaces
+
+def check_mismatches(openapi, ts_interfaces):
+    mismatches = []
+    schemas = openapi.get("components", {}).get("schemas", {})
     
-    methods = {}
-    service_dir = 'app/application/services'
-    for f in os.listdir(service_dir):
-        if f.endswith('.py') and f != '__init__.py':
-            module_name = f'app.application.services.{f[:-3]}'
-            try:
-                mod = __import__(module_name, fromlist=['*'])
-                for name, obj in inspect.getmembers(mod, inspect.isclass):
-                    if name.endswith('Service'):
-                        for m_name, m_obj in inspect.getmembers(obj, inspect.isfunction):
-                            methods[f'{name}.{m_name}'] = list(inspect.signature(m_obj).parameters.keys())
-            except Exception as e:
-                pass
-    return methods
+    # Map Backend Schemas to Frontend DTOs based on naming conventions
+    # e.g., TripResponse -> TripResponseDto, UserCreate -> UserCreateDto, etc.
+    for backend_name, schema in schemas.items():
+        if backend_name.endswith("Exception") or backend_name == "APIResponse":
+            continue
+            
+        # Very simple heuristic for finding matching TS interface
+        frontend_candidates = [backend_name, backend_name + "Dto", backend_name + "Response", backend_name.replace("Response", "ResponseDto")]
+        matched_ts = None
+        matched_name = None
+        for candidate in frontend_candidates:
+            if candidate in ts_interfaces:
+                matched_ts = ts_interfaces[candidate]
+                matched_name = candidate
+                break
+                
+        if not matched_ts:
+            # We don't report missing matching names as it's too noisy, only if fields mismatch
+            continue
+            
+        backend_props = schema.get("properties", {})
+        backend_required = schema.get("required", [])
+        
+        for prop_name, prop_details in backend_props.items():
+            if prop_name not in matched_ts:
+                mismatches.append(f"[FAIL] [Missing Field] Backend {backend_name}.{prop_name} not found in Frontend {matched_name}")
+            else:
+                ts_prop = matched_ts[prop_name]
+                is_req_backend = prop_name in backend_required
+                is_req_frontend = not ts_prop["optional"]
+                
+                # Check snake_case vs camelCase mismatch typically
+                if "_" in prop_name and not prop_name.islower():
+                    mismatches.append(f"[WARN] [Naming] {backend_name}.{prop_name} has mixed case (ensure snake_case/camelCase alignment)")
+                    
+                if is_req_backend != is_req_frontend:
+                    mismatches.append(f"[WARN] [Optionality] {backend_name}.{prop_name} required={is_req_backend} but Frontend optional={ts_prop['optional']}")
 
-def find_api_calls():
-    api_dir = 'app/api/v1'
-    calls = []
-    for f in os.listdir(api_dir):
-        if f.endswith('.py') and f != '__init__.py':
-            with open(os.path.join(api_dir, f), 'r', encoding='utf-8') as file:
-                tree = ast.parse(file.read())
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-                        if isinstance(node.func.value, ast.Name) and node.func.value.id.endswith('_service'):
-                            service_var = node.func.value.id
-                            method_name = node.func.attr
-                            kwargs = [kw.arg for kw in node.keywords if kw.arg]
-                            calls.append({
-                                'file': f,
-                                'service_var': service_var,
-                                'method': method_name,
-                                'kwargs': kwargs
-                            })
-    return calls
+    return mismatches
 
-methods = get_service_methods()
-calls = find_api_calls()
-
-mismatches = []
-for c in calls:
-    service_class_name = ''.join(word.capitalize() for word in c['service_var'].split('_'))
-    key = f"{service_class_name}.{c['method']}"
+async def main():
+    print("Fetching OpenAPI Spec from backend...")
+    openapi = await fetch_openapi()
+    if not openapi:
+        return
+        
+    print("Extracting TypeScript interfaces from frontend...")
+    # Use absolute path to avoid cwd issues
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    frontend_dir = os.path.abspath(os.path.join(current_dir, "../../frontend/src/features"))
+    ts_interfaces = extract_ts_interfaces(frontend_dir)
     
-    if key in methods:
-        allowed_args = methods[key]
-        for kw in c['kwargs']:
-            if kw not in allowed_args:
-                mismatches.append(f"- **{c['file']}**: Endpoint calls `{key}` with unexpected kwarg `{kw}`")
-    else:
-        mismatches.append(f"- **{c['file']}**: Endpoint calls unknown method `{key}`")
-
-with open('service_signature_mismatches.md', 'w') as out:
-    out.write('# Service Signature Mismatches\n\n')
+    print("Checking for mismatches...")
+    mismatches = check_mismatches(openapi, ts_interfaces)
+    
     if mismatches:
-        out.write('\n'.join(mismatches))
+        print("\n--- API Contract Mismatches Found ---")
+        for m in mismatches:
+            print(m)
+        print("-------------------------------------")
     else:
-        out.write('No mismatches found!\n')
+        print("\n[OK] No significant API contract mismatches found!")
+
+if __name__ == "__main__":
+    asyncio.run(main())

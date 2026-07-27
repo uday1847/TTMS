@@ -98,6 +98,10 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 def create_access_token(
     subject: str | Any,
+    email: str = None,
+    username: str = None,
+    roles: list[str] = None,
+    permissions: list[str] = None,
     expires_delta: timedelta | None = None,
 ) -> str:
     if expires_delta:
@@ -110,6 +114,10 @@ def create_access_token(
     to_encode = {
         "exp": expire,
         "sub": str(subject),
+        "email": email or "",
+        "username": username or "",
+        "roles": roles or [],
+        "permissions": permissions or [],
         "type": "access",
         "iss": security_settings.TOKEN_ISSUER,
         "aud": security_settings.TOKEN_AUDIENCE,

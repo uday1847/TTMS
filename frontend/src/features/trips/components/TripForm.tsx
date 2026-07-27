@@ -3,11 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { tripSchema, type TripFormData } from '../schemas/trip.schema';
 import type { TripResponseDto } from '../types/trip.types';
 import { FormField, FormInput, FormActions } from '@/shared/components/form';
-// Mock hook until Party module is fully implemented in frontend
-const useParties = (_options?: any) => ({
-  data: { items: [] as { id: string, name: string }[], total: 0, page: 1, size: 10 },
-  isLoading: false
-});
+import { useParties } from '@/features/parties/hooks/use-parties';
 import { useTractors } from '@/features/tractors/hooks/use-tractors';
 import { useDrivers } from '@/features/drivers/hooks/use-drivers';
 import { Loader2 } from 'lucide-react';
@@ -24,9 +20,9 @@ export function TripForm({ initialData, onSubmit, isLoading, onCancel }: TripFor
   const isEditing = !!initialData;
   const isLocked = isEditing && initialData.status !== 'PENDING' && initialData.status !== 'CANCELLED';
 
-  const { data: partiesResponse, isLoading: isLoadingParties } = useParties({ size: 1000 });
-  const { data: tractorsResponse, isLoading: isLoadingTractors } = useTractors({ size: 1000, status: 'AVAILABLE' });
-  const { data: driversResponse, isLoading: isLoadingDrivers } = useDrivers({ size: 1000, status: 'AVAILABLE' });
+  const { data: partiesResponse, isLoading: isLoadingParties } = useParties({ size: 100 });
+  const { data: tractorsResponse, isLoading: isLoadingTractors } = useTractors({ size: 100, status: 'ACTIVE' });
+  const { data: driversResponse, isLoading: isLoadingDrivers } = useDrivers({ size: 100, status: 'ACTIVE' });
 
   const form = useForm<TripFormData>({
     resolver: zodResolver(tripSchema) as any,

@@ -107,16 +107,16 @@ async def lifespan(app: FastAPI):
             raise RuntimeError("RBAC Validation Failed: Duplicate permissions found.")
             
         # Validate Admin role
-        res = await session.execute(select(Role).options(selectinload(Role.permissions)).where(Role.name == "admin"))
+        res = await session.execute(select(Role).options(selectinload(Role.permissions)).where(Role.name == "Admin"))
         admin_role = res.scalar_one_or_none()
         if not admin_role:
-            raise RuntimeError("RBAC Validation Failed: 'admin' role not found in database.")
+            raise RuntimeError("RBAC Validation Failed: 'Admin' role not found in database.")
             
         if not admin_role.permissions:
-            raise RuntimeError("RBAC Validation Failed: 'admin' role has no permissions.")
+            raise RuntimeError("RBAC Validation Failed: 'Admin' role has no permissions.")
             
         # Validate Operator role
-        res = await session.execute(select(Role).where(Role.name == "operator"))
+        res = await session.execute(select(Role).where(Role.name == "Operator"))
         operator_role = res.scalar_one_or_none()
         if not operator_role:
             logger.warning("RBAC Validation Warning: 'operator' role not found.")
